@@ -57,6 +57,7 @@ def ot_timesheet(timesheet, method):
         sas.amount = ot1
         sas.company = timesheet.company
         sas.series = "HR-ADS-.YY.-.MM.-"
+        sas.timesheet = timesheet.name
         sas.save()
         sas.submit()
 
@@ -68,6 +69,7 @@ def ot_timesheet(timesheet, method):
         sas.amount = ot2
         sas.company = timesheet.company
         sas.series = "HR-ADS-.YY.-.MM.-"
+        sas.timesheet = timesheet.name
         sas.save()
         sas.submit()
 
@@ -634,6 +636,8 @@ def add_dues(leave_application, method):
                                 })
                         jv.leave_application = leave_application.name
                         jv.save(ignore_permissions=True)
+                        jv.submit()
+
 
                 
 
@@ -644,6 +648,10 @@ def cancel_dues(leave_application, method):
     for item in frappe.get_all("Additional Salary", filters={"leave_application": leave_application.name}, fields=["name"]):
         a_s = frappe.get_doc("Additional Salary", item.name)
         a_s.cancel()
+
+    for item in frappe.get_all("Journal Entry", filters={"leave_application": leave_application.name}, fields=["name"]):
+        a_s = frappe.get_doc("Journal Entry", item.name)
+        a_s.cancel()    
 
 #7/9
 # This method adds the monthly ACCRUALS for Leave Salary, Airticket Payable, and EOSB Payable for each employee. 
