@@ -1084,23 +1084,30 @@ def add_benefits(salary_slip, method):
 
 #8/9
 # This adds the employees monthly Accrued Leave DAYS entry in the leave days ledger.
+# ********  Schedulur events - Monthly  ******** DISABLED !!!!!
 @frappe.whitelist()
-def allocate_leave():
+def allocate_leave(salary_slip, method):
     for item in frappe.get_all("Employee", filters={"status": "Active",  "leave_salary": 1}, fields=["name"]):
         emp = frappe.get_doc("Employee", item.name)
-        
+        mldays = 0
         if emp.leave_cycle:
             frappe.errprint(emp.name)
             lc = frappe.get_doc("Leave Cycle", emp.leave_cycle)
             #lc_month = int(salary_slip.start_date[5:7])
+            #*******************************************************************************************************************************
+            # CHANGED 'item' below to 'item1' not to conflict with 'item' in the above loop
+            #******************************************************************************************
             d = datetime.datetime.now()
             lc_month = d.strftime("%m")
-            for item in lc.get("monthly_leave"):
-                if item.month == lc_month:
-                    l_days = item.leaves
+            for iteml in lc.get("monthly_leave"):
+                if iteml.month == lc_month:
+                    mldays = iteml.leaves
             #frappe.errprint(lc_month)
             #frappe.errprint(l_days)
-            l_days = round((31 / float(lc.work_days)) * float(lc.leave_days) * 2) / 2
+             #*******************************************************************************************************************************
+            # ADDED CODE
+            #
+            l_days = round((salary_slip.payment_days / float(salary_slip.total_working_days)) * float(mldays) * 2) / 2
             la_list = frappe.get_all("Leave Ledger Entry", filters={"employee": emp.name,  "leave_type": "Annual Leave", "transaction_type":"Leave Allocation"}, fields=["transaction_name", "from_date", "to_date"], order_by="creation desc")
             #if emp.name != "2009":
             if la_list:

@@ -112,7 +112,7 @@ doc_events = {
     },
     "Salary Slip": {
         "before_save": "summer_note.common.add_expense_claim",
-        "on_submit": "summer_note.common.add_benefits"
+        "on_submit": ["summer_note.common.add_benefits", "summer_note.common.allocate_leave"]
     },
     "Leave Application": {
         "on_submit": "summer_note.common.add_dues",
