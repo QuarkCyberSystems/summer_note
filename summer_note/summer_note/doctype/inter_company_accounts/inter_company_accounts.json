@@ -1,0 +1,37 @@
+{
+ "creation": "2021-03-15 10:55:22.091252",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "default_account"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "description": "Default Bank / Cash account will be automatically updated in Salary Journal Entry when this mode is selected.",
+   "fieldname": "default_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Default Account",
+   "options": "Account"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-03-15 10:55:22.091252",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Inter Company Accounts",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
