@@ -626,7 +626,7 @@ def add_dues(leave_application, method):
                                 #*******************************************************************************************************************************
                                 # ADDED CODE
                                 #*******************************************************************************************************************************
-                                "divisions": frappe.get_value("Department", frappe.get_value("Employee", leave_application.employee, "department"), "divisions"),
+                                "divisions": frappe.get_value("Department", frappe.get_value("Employee", leave_application.employee, "department"), "division"),
                                 "department":frappe.get_value("Department", frappe.get_value("Employee", leave_application.employee, "department"), "department"),
                                 "cost_center":frappe.get_value("Department", frappe.get_value("Employee", leave_application.employee, "department"), "cost_center"),
                                 "employee":leave_application.employee,
