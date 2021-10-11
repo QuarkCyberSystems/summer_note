@@ -403,13 +403,23 @@ def inter_company(start_date, end_date, payroll_entry):
 
     frappe.msgprint("Inter Company WPS JVs have been set to draft")
 
+
+
+
 #5/9    
 # This method adds a "Additional Salary" document as "Additional Dues" Salary Component into the "SalarySlip" against "LEAVE APPLICATIONs" Taken by the employee.
 # It depends on the Annual Leave days taken and selection of flag in the Leave application to include_all_leave_salary_and_airfare_dues_with_next_payment.                        
-def add_dues(leave_application, method):
+def add_dues(salary_slip, method):
 #*******************************************************************************************************************************
 # ONLY APPROVED (STATUS) AND SUBMITTED (DOCUMENT STATUS) ENTRIES ARE TO BE CONSIDERED. CONFIRM SELECTION!
 #*******************************************************************************************************************************
+    
+    frappe.get_all('Leave Application', filters={
+                'status': 'Approved',
+                'employee': salary_slip.employee,
+                'docstatus':1
+            }, fields=['name', 'total_sanctioned_amount'])
+    
     if leave_application.status == "Approved":
         company = frappe.get_value("Employee", leave_application.employee, "company")
         lc = frappe.get_value("Employee", leave_application.employee, "leave_cycle")
@@ -1179,5 +1189,8 @@ def mark_absent(leave_application, method):
 # today = 28-03-2021
         
                        
+#CANCEL CODE FOR SALARY SLIPS
+def cancel_salary_slip(salary_slip, method):
+    for item in frappe.get_all("Expense Claim", filters={"salary_slip": salary_slip.name}, fields=["name"]):
+        frappe.set_value("Expense Claim", item.name, "salary_slip", "")
 
-    
