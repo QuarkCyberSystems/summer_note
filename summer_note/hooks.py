@@ -103,24 +103,47 @@ app_include_css = [
 #	}
 # }
 
+#doc_events = {
+ #   "Timesheet": {
+#        "on_submit": "summer_note.common.ot_timesheet"
+#    },
+#    "Sales Order": {
+#        "before_submit": "summer_note.common.add_project"
+#    },
+#    "Salary Slip": {
+#        "before_save": "summer_note.common.add_expense_claim",
+#        "on_submit": ["summer_note.common.add_benefits", "summer_note.common.allocate_leave"],
+#        "on_cancel": "summer_note.common.cancel_salary_slip"
+#    },
+#    "Leave Application": {
+#        "on_submit": "summer_note.common.add_dues",
+#        "on_cancel": "summer_note.common.cancel_dues"
+#    }
+
+#}
+
 doc_events = {
     "Timesheet": {
-        "on_submit": "summer_note.common.ot_timesheet"
-    },
-    "Sales Order": {
-        "before_submit": "summer_note.common.add_project"
-    },
-    "Salary Slip": {
-        "before_save": "summer_note.common.add_expense_claim",
-        "on_submit": ["summer_note.common.add_benefits", "summer_note.common.allocate_leave"],
-        "on_cancel": "summer_note.common.cancel_salary_slip"
+        "on_submit": "summer_note.common.ot_timesheet", #1/12
+        "on_cancel": "summer_note.common.cancel_timesheet" #12/12
     },
     "Leave Application": {
-        "on_submit": "summer_note.common.add_dues",
-        "on_cancel": "summer_note.common.cancel_dues"
+        "on_cancel": "summer_note.common.cancel_dues" #2/12
+    },
+    "Salary Slip": {
+        "before_save": ["summer_note.common.add_expense_claim", "summer_note.common.add_benefits", "summer_note.common.add_dues"], #3/12, #5/12, 4/12
+        "on_submit":  "summer_note.common.allocate_leave", # 6/12
+        "on_cancel": "summer_note.common.cancel_salary_slip", #7/12
+        "on_trash": "summer_note.common.cancel_salary_slip"
+        },
+    "Expense Claim": {
+        "on_cancel": "summer_note.common.cancel_expense_claim" #11/12
+    },
+    "Sales Order": {
+        "before_submit": "summer_note.common.add_project" #9/12
     }
-
 }
+
 
 # Scheduled Tasks
 # ---------------
