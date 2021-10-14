@@ -131,7 +131,7 @@ def add_expense_claim(salary_slip, method):
 
         #*******************************************************************************************************************************
         # ADDED CODE
-        nest_cc = frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department_name"), "cost_center")
+        nest_cc = frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center")
         #nest_cc = frappe.get_value("Company", salary_slip.company, "cost_center")
         #*******************************************************************************************************************************
         salary_exp_account = frappe.get_value("Company", salary_slip.company, "default_payroll_payable_account")
@@ -158,7 +158,7 @@ def add_expense_claim(salary_slip, method):
                     # ADDED CODE
                     #*******************************************************************************************************************************
                     "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                    "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                    "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                     "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                     "employee":salary_slip.employee,
                     "user_remark": claims
@@ -171,7 +171,7 @@ def add_expense_claim(salary_slip, method):
                     # ADDED CODE
                     #*******************************************************************************************************************************
                     "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                    "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                    "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                     "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                     "employee":salary_slip.employee,
                     "user_remark": claims
@@ -294,7 +294,7 @@ def add_dues(salary_slip, method):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":leave_application.name
@@ -308,7 +308,7 @@ def add_dues(salary_slip, method):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":leave_application.name
@@ -321,7 +321,7 @@ def add_dues(salary_slip, method):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":leave_application.name
@@ -334,7 +334,7 @@ def add_dues(salary_slip, method):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":leave_application.name
@@ -345,6 +345,7 @@ def add_dues(salary_slip, method):
 
                     #leave Application being set with salary slip
                     frappe.set_value("Leave Application", leave_application.namne, "salary_slip", salary_slip.name)
+
 
         # if not collect all balances
         else:
@@ -412,6 +413,9 @@ def add_dues(salary_slip, method):
                         jv.submit()
                         #leave Application being set with salary slip
                         frappe.set_value("Leave Application", leave_application.namne, "salary_slip", salary_slip.name)
+
+    salary_slip.calculate_net_pay()
+
 
 #5/12
 # This method adds the monthly ACCRUALS for Leave Salary, Airticket Payable, and EOSB Payable for each employee. 
@@ -514,7 +518,7 @@ def add_benefits(salary_slip, method):
                 # ADDED CODE
                 #*******************************************************************************************************************************
                 "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                 "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                 "employee":salary_slip.employee,
                 "user_remark":salary_slip.name
@@ -527,7 +531,7 @@ def add_benefits(salary_slip, method):
                 # ADDED CODE
                 #*******************************************************************************************************************************
                 "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                 "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                 "employee":salary_slip.employee,
                 "user_remark":salary_slip.name
@@ -554,7 +558,7 @@ def add_benefits(salary_slip, method):
                 # ADDED CODE
                 #*******************************************************************************************************************************
                 "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                 "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                 "employee":salary_slip.employee,
                 "user_remark":salary_slip.name
@@ -566,7 +570,7 @@ def add_benefits(salary_slip, method):
                 # ADDED CODE
                 #*******************************************************************************************************************************
                 "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                 "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                 "employee":salary_slip.employee,
                 "user_remark":salary_slip.name
@@ -589,7 +593,7 @@ def add_benefits(salary_slip, method):
                 # ADDED CODE
                 #*******************************************************************************************************************************
                 "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                 "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                 "employee":salary_slip.employee,
                 "user_remark":salary_slip.name
@@ -601,7 +605,7 @@ def add_benefits(salary_slip, method):
                 # ADDED CODE
                 #*******************************************************************************************************************************
                 "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                 "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                 "employee":salary_slip.employee,
                 "user_remark":salary_slip.name
@@ -646,7 +650,7 @@ def add_benefits(salary_slip, method):
             # ADDED CODE
             #*******************************************************************************************************************************
             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
             "employee":salary_slip.employee,
             "user_remark":salary_slip.name
@@ -658,7 +662,7 @@ def add_benefits(salary_slip, method):
             # ADDED CODE
             #*******************************************************************************************************************************
             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
             "employee":salary_slip.employee,
             "user_remark":salary_slip.name
@@ -675,7 +679,7 @@ def add_benefits(salary_slip, method):
                     # ADDED CODE
                     #*******************************************************************************************************************************
                     "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                    "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                    "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                     "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                     "employee":salary_slip.employee,
                     "user_remark":salary_slip.name
@@ -689,7 +693,7 @@ def add_benefits(salary_slip, method):
                     # ADDED CODE
                     #*******************************************************************************************************************************
                     "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                    "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                    "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                     "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                     "employee":salary_slip.employee,
                     "user_remark":salary_slip.name
@@ -725,7 +729,7 @@ def add_benefits(salary_slip, method):
                     # ADDED CODE
                     #*******************************************************************************************************************************
                     "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                    "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                    "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                     "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                     "employee":salary_slip.employee,
                     "user_remark":salary_slip.name
@@ -758,7 +762,7 @@ def add_benefits(salary_slip, method):
                     "party_type":"Employee",
                     "party":salary_slip.employee,
                     "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                    "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                    "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                     "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                     "employee":salary_slip.employee,
                     "user_remark":salary_slip.name
@@ -932,7 +936,7 @@ def inter_company(start_date, end_date, payroll_entry):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":item.name
@@ -945,7 +949,7 @@ def inter_company(start_date, end_date, payroll_entry):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":item.name
@@ -967,7 +971,7 @@ def inter_company(start_date, end_date, payroll_entry):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":item.name
@@ -980,7 +984,7 @@ def inter_company(start_date, end_date, payroll_entry):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":item.name
@@ -1003,7 +1007,7 @@ def inter_company(start_date, end_date, payroll_entry):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":item.name
@@ -1016,7 +1020,7 @@ def inter_company(start_date, end_date, payroll_entry):
                             # ADDED CODE
                             #*******************************************************************************************************************************
                             "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                             "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                             "employee":salary_slip.employee,
                             "user_remark":item.name
@@ -1040,7 +1044,7 @@ def inter_company(start_date, end_date, payroll_entry):
                         # ADDED CODE
                         #*******************************************************************************************************************************
                         "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                        "department":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "department_name"),
+                        "department":frappe.get_value("Employee", salary_slip.employee, "department"),
                         "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
                         "employee":salary_slip.employee,
                         "user_remark":payroll_entry.name
