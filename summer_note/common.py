@@ -470,22 +470,26 @@ def add_benefits(salary_slip, method):
 # It depends on the Annual Leave days taken and selection of flag in the Leave application to include_all_leave_salary_and_airfare_dues_with_next_payment.
 # ********  Salary Slip - Before Save  ********
 def add_dues(salary_slip, method):
+    
     frappe.errprint ('******** 5 ADD DUES ********')
+    frappe.errprint(salary_slip.employee)
     la_list = frappe.get_all('Leave Application', filters={
                 'status': 'Approved',
                 'leave_type': 'Annual Leave',
                 'employee': salary_slip.employee,
                 'docstatus':1,
                 'salary_slip':'',
-                #"from_date": ['between', salary_slip.start_date, salary_slip.end_date]
-                'from_date': ['>=', str(salary_slip.start_date)], # *******************************************************************************************************
-                'from_date': ['<=', str(salary_slip.end_date)]
+                'from_date': ['between', [salary_slip.start_date, salary_slip.end_date]]
+                #'from_date': ['>=', salary_slip.start_date], # *******************************************************************************************************
+                #'from_date': ['<=', salary_slip.end_date]
             }, fields=['name'])
+    frappe.errprint(la_list)        
 
     frappe.errprint('Leave Applications Start Date: ' + str(salary_slip.start_date)) # ****************************************************************************************
     frappe.errprint('Leave Applications End Date: ' + str(salary_slip.end_date))  # *******************************************************************************************
     frappe.errprint('Leave Applications Found: ' + str(len(la_list))) # *******************************************************************************************************
 
+   
     for la_item in la_list:
         frappe.errprint('Processing Leave Application: ' + str(la_item.name))  # **********************************************************************************************
         leave_application = frappe.get_doc("Leave Application", la_item.name)
@@ -741,6 +745,7 @@ def add_dues(salary_slip, method):
     salary_payable_ledger = frappe.get_value("Company",salary_slip.company, "default_payroll_payable_account")
 
     if salary_slip.company != s_comp:
+        frappe.errprint("Company Comparison")
         for item in o_comp_doc.get("related_parties_receivable_account"):
             if item.company == s_comp:
                 s_comp_ledger = item.receivable_account
@@ -748,6 +753,9 @@ def add_dues(salary_slip, method):
         jv.append("accounts",{
                     "account": s_comp_ledger,
                     "credit_in_account_currency": salary_slip.net_pay,
+                    "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+                    "department":frappe.get_value("Employee", salary_slip.employee, "department"),
+                    "cost_center":frappe.get_value("Company", frappe.get_value("Employee",salary_slip.employee, "company"), "cost_center"),
                     "user_remark":salary_slip.name
                     })
         jv.append("accounts",{
@@ -794,7 +802,7 @@ def add_dues(salary_slip, method):
                     "party":salary_slip.employee,
                     "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
                     "department":frappe.get_value("Employee", salary_slip.employee, "department"),
-                    "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+                    "cost_center":frappe.get_value("Company", frappe.get_value("Employee",salary_slip.employee, "sponsoring_company"), "cost_center"),
                     "employee":salary_slip.employee,
                     "user_remark":salary_slip.name
                     
@@ -802,11 +810,14 @@ def add_dues(salary_slip, method):
         jv.append("accounts",{
                     "account": salary_payable_ledger,
                     "credit_in_account_currency": salary_slip.net_pay,
+                    "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+                    "department":frappe.get_value("Employee", salary_slip.employee, "department"),
+                    "cost_center":frappe.get_value("Company", frappe.get_value("Employee",salary_slip.employee, "sponsoring_company"), "cost_center"),
                     "user_remark":salary_slip.name
                     })
         jv.salary_slip = salary_slip.name
         jv.save()
-        jv.submit()
+        #jv.submit()
 
     salary_slip.calculate_net_pay()
     salary_slip.save()
