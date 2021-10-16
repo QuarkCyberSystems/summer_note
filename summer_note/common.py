@@ -78,6 +78,7 @@ def cancel_dues(leave_application, method):
 # ********  Salary Slip - Before Save  ********
 def add_expense_claim(salary_slip, method):
     #emp = salary_slip.employee
+    frappe.errprint ('******** 3 ADD EXPENSE CLAIMS ********')
     if salary_slip.expense_claim_added == 0:
         exp_claim =  frappe.get_all('Expense Claim', filters={
                 'status': 'Unpaid',
@@ -115,7 +116,6 @@ def add_expense_claim(salary_slip, method):
             claims += item.name + ", "
             #*******************************************************************************************************************************
             frappe.set_value('Expense Claim', item.name, 'status', 'Paid')
-            #frappe.set_value('Expense Claim', item.name, 'added_to_salary_slip', 1)
             frappe.set_value('Expense Claim', item.name, 'salary_slip', salary_slip.name)
         
         #*******************************************************************************************************************************
@@ -132,15 +132,17 @@ def add_expense_claim(salary_slip, method):
         #*******************************************************************************************************************************
         # ADDED CODE
         nest_cc = frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center")
+        frappe.errprint('3. add_expense_claim Cost Center - ' + nest_cc)
         #nest_cc = frappe.get_value("Company", salary_slip.company, "cost_center")
         #*******************************************************************************************************************************
         salary_exp_account = frappe.get_value("Company", salary_slip.company, "default_payroll_payable_account")
         exp_account = frappe.get_value("Company", salary_slip.company, "default_expense_claim_payable_account")
         pay_control = frappe.get_value("Company", salary_slip.company, "payroll_controll")
+
         jv = frappe.new_doc("Journal Entry")
         jv.company = salary_slip.company
         jv.posting_date = salary_slip.posting_date
-        #if salary_slip.company == ""
+        jv.title = salary_slip.name + " Expense Claims: " + salary_slip.start_date
         if salary_slip.company == "National Engineering Services & Trading Co LLC":
             jv.naming_series = "JV/HR/.YY./.####"
         if salary_slip.company == "NEST Employment Services LLC":
@@ -179,248 +181,17 @@ def add_expense_claim(salary_slip, method):
 
             jv.salary_slip = salary_slip.name
             jv.save()
+            jv.submit()
 
         salary_slip.calculate_net_pay()
+        salary_slip.save()
 
 #4/12
-# This method adds a "Additional Salary" document as "Additional Dues" Salary Component into the "SalarySlip" against "LEAVE APPLICATIONs" Taken by the employee.
-# It depends on the Annual Leave days taken and selection of flag in the Leave application to include_all_leave_salary_and_airfare_dues_with_next_payment.
-# ********  Salary Slip - Before Save  ********
-def add_dues(salary_slip, method):
-    la_list = frappe.get_all('Leave Application', filters={
-                'status': 'Approved',
-                'employee': salary_slip.employee,
-                'docstatus':1,
-                "salary_slip":"",
-                "from_date": (">=", salary_slip.start_date),
-                "from_date": ("<=", salary_slip.end_date)
-            }, fields=['name'])
-
-    for la_item in la_list:
-        leave_application = frappe.get_doc("Leave Application", la_item.name)
-        # DELETED IF (NOT REQUIRED) ************************************************************************************************************************************
-        #if leave_application.status == "Approved":
-        company = frappe.get_value("Employee", leave_application.employee, "company")
-        lc = frappe.get_value("Employee", leave_application.employee, "leave_cycle")
-        ld = frappe.get_value("Leave Cycle", lc, "leave_days")
-        wd = frappe.get_value("Leave Cycle", lc, "work_days")
-        employee = frappe.get_doc("Employee", leave_application.employee)
-        lwd = employee.ticket_entitlement_workdays
-        tc = frappe.get_value("Ticket Sectors", employee.ticket_sector, "amount")
-        # TWO DIFFERENT ACCOUNTS!!
-        #account_ledger = ""
-        ls_account_ledger = ""
-        ar_account_ledger = ""
-        cpt = ""
-        ssta = frappe.get_value("Salary Structure Assignment", {"employee":leave_application.employee, "docstatus":"1"}, "salary_structure")
-        sst = frappe.get_doc("Salary Structure", ssta)
-
-        for item in sst.get("earnings"):
-            if item.salary_component == "Leave Salary":
-                sc = frappe.get_doc("Salary Component", "Leave Salary")
-                for comp in sc.get("accounts"):
-                    if comp.company == company:
-                        ls_account_ledger = comp.default_account
-                        leave_cpt = item.salary_component 
-            if item.salary_component == "Op.Leave Salary":
-                sc = frappe.get_doc("Salary Component", "Op.Leave Salary")
-                for comp in sc.get("accounts"):
-                    if comp.company == company:
-                        ls_account_ledger = comp.default_account
-                        leave_cpt = item.salary_component 
-            if item.salary_component == "Staff Airfare":
-                sc = frappe.get_doc("Salary Component", "Staff Airfare")
-                for comp in sc.get("accounts"):
-                    if comp.company == company:
-                        ar_account_ledger = comp.default_account
-                        air_cpt = item.salary_component 
-            if item.salary_component == "Op.Staff Airfare":
-                sc = frappe.get_doc("Salary Component", "Op.Staff Airfare")
-                for comp in sc.get("accounts"):
-                    if comp.company == company:
-                        ar_account_ledger = comp.default_account
-                        air_cpt = item.salary_component
-
-        ar = get_balance_on(frappe.get_value("Company", company, "default_ticket_payable_account"), leave_application.from_date, "Employee", leave_application.employee)
-        ls = get_balance_on(frappe.get_value("Company", company, "default_leave_salary_payable"), leave_application.from_date, "Employee", leave_application.employee)                  
-
-        #if leave_application.include_all_leave_salary_and_airfare_dues_with_next_payment and leave_application.leave_type != "Leave Without Pay" and leave_application.leave_type != "Sick Leave":
-        if leave_application.include_all_leave_salary_and_airfare_dues_with_next_payment and leave_application.leave_type == "Annual Leave":
-            # create additional salary as per total
-
-            # Leave Salary only
-            if ((ls) * -1 ) > 0:
-                sas = frappe.new_doc("Additional Salary")
-                sas.payroll_date = leave_application.from_date
-                sas.employee = leave_application.employee
-                sas.salary_component = leave_cpt
-                sas.amount = (ls) * -1
-                sas.company = company
-                sas.series = "HR-ADS-.YY.-.MM.-"
-                sas.leave_application = leave_application.name
-                sas.save(ignore_permissions=True)
-                sas.submit()
-
-            # airticket only
-            if ((ar) * -1 ) > 0:
-                sas = frappe.new_doc("Additional Salary")
-                sas.payroll_date = leave_application.from_date
-                sas.employee = leave_application.employee
-                sas.salary_component = air_cpt
-                sas.amount = (ar) * -1
-                sas.company = company
-                sas.series = "HR-ADS-.YY.-.MM.-"
-                sas.leave_application = leave_application.name
-                sas.save(ignore_permissions=True)
-                sas.submit()
-
-                jv = frappe.new_doc("Journal Entry")
-                jv.company = company
-                jv.posting_date = leave_application.from_date
-                if company == "National Engineering Services & Trading Co LLC":
-                    jv.naming_series = "JV/HR/.YY./.####"
-                if company == "NEST Employment Services LLC":
-                    jv.naming_series = "NEE-JV/HR/.YY./.####"
-                if company == "Firmo Technical Petroleum Services LLC":
-                    jv.naming_series = "FIRMO-JV/HR/.YY./.####"
-                jv.voucher_type = "Journal Entry"
-                if (ar + ls) > 0:
-                    jv.append("accounts",{
-                            "account": frappe.get_value("Company", company, "default_ticket_payable_account"),
-                            "party_type":"Employee",
-                            "party":leave_application.employee,
-                            "debit_in_account_currency": ar,
-                            #*******************************************************************************************************************************
-                            # ADDED CODE
-                            #*******************************************************************************************************************************
-                            "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
-                            "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
-                            "employee":salary_slip.employee,
-                            "user_remark":leave_application.name
-                            })
-                    jv.append("accounts",{
-                            "account": frappe.get_value("Company", company, "default_leave_salary_payable"),
-                            "party_type":"Employee",
-                            "party":leave_application.employee,
-                            "debit_in_account_currency": ls,
-                            #*******************************************************************************************************************************
-                            # ADDED CODE
-                            #*******************************************************************************************************************************
-                            "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
-                            "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
-                            "employee":salary_slip.employee,
-                            "user_remark":leave_application.name
-                            })
-                    jv.append("accounts",{
-                            "account": frappe.get_value("Company", company, "default_payroll_payable_account"),
-                            "account": ls_account_ledger,
-                            "credit_in_account_currency": ls,
-                            #*******************************************************************************************************************************
-                            # ADDED CODE
-                            #*******************************************************************************************************************************
-                            "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
-                            "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
-                            "employee":salary_slip.employee,
-                            "user_remark":leave_application.name
-                            })
-                    jv.append("accounts",{
-                            "account": frappe.get_value("Company", company, "default_payroll_payable_account"),
-                            "account": ar_account_ledger,
-                            "credit_in_account_currency": ar,
-                            #*******************************************************************************************************************************
-                            # ADDED CODE
-                            #*******************************************************************************************************************************
-                            "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                            "department":frappe.get_value("Employee", salary_slip.employee, "department"),
-                            "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
-                            "employee":salary_slip.employee,
-                            "user_remark":leave_application.name
-                            })
-                    jv.leave_application = leave_application.name
-                    jv.save(ignore_permissions=True)
-                    jv.submit()
-
-                    #leave Application being set with salary slip
-                    frappe.set_value("Leave Application", leave_application.namne, "salary_slip", salary_slip.name)
-
-
-        # if not collect all balances
-        else:
-            #if leave_application.leave_type != "Sick Leave" and leave_application.leave_type != "Leave Without Pay":
-            if leave_application.leave_type == "Annual Leave":
-                ssa_list = frappe.get_all("Salary Structure Assignment", filters={"employee": leave_application.employee}, fields=["name", "salary_structure"], order_by="creation desc")
-                lsal = 0
-                asal = 0
-                    
-                sst = frappe.get_doc("Salary Structure", ssa_list[0].salary_structure)
-                for item in sst.get("earnings"):
-                    if frappe.get_value("Salary Component", item.salary_component, "include_in_leave_salary_provision") == 1:
-                        lsal += item.amount
-                    if frappe.get_value("Salary Component", item.salary_component, "include_in_airfare_provision") == 1:
-                        asal += item.amount
-
-                lscal = min(round((leave_application.total_leave_days / float(ld) * lsal) * 100) / 100, abs(ls))
-                arcal = min(round((leave_application.total_leave_days / float(lwd)) * float(tc) * 100) / 100, abs(ar))
-
-                if (lscal) > 0:
-                    sas = frappe.new_doc("Additional Salary")
-                    sas.payroll_date = leave_application.from_date
-                    sas.employee = leave_application.employee
-                    sas.salary_component = leave_cpt
-                    sas.amount = lscal
-                    sas.company = company
-                    sas.leave_application = leave_application.name
-                    sas.overwrite_salary_structure_amount = 1
-                    sas.series = "HR-ADS-.YY.-.MM.-"
-                    sas.save(ignore_permissions=True)
-                    sas.submit()
-
-                    jv = frappe.new_doc("Journal Entry")
-                    jv.company = company
-                    jv.posting_date = leave_application.from_date
-                    #if salary_slip.company == ""
-                    if company == "National Engineering Services & Trading Co LLC":
-                        jv.naming_series = "JV/HR/.YY./.####"
-                    if company == "NEST Employment Services LLC":
-                        jv.naming_series = "NEE-JV/HR/.YY./.####"
-                    if company == "Firmo Technical Petroleum Services LLC":
-                        jv.naming_series = "FIRMO-JV/HR/.YY./.####"
-                    jv.voucher_type = "Journal Entry"
-                    if (lscal) > 0:
-                        jv.append("accounts",{
-                                "account": frappe.get_value("Company", company, "default_leave_salary_payable"),
-                                "party_type":"Employee",
-                                "party":leave_application.employee,
-                                "debit_in_account_currency": lscal
-                                })        
-                        jv.append("accounts",{
-                                "account": ls_account_ledger,
-                                "credit_in_account_currency": lscal,
-                                #*******************************************************************************************************************************
-                                # ADDED CODE
-                                #*******************************************************************************************************************************
-                                "divisions": frappe.get_value("Department", frappe.get_value("Employee", leave_application.employee, "department"), "division"),
-                                "department":frappe.get_value("Employee", leave_application.employee, "department"),
-                                "cost_center":frappe.get_value("Department", frappe.get_value("Employee", leave_application.employee, "department"), "cost_center"),
-                                "employee":leave_application.employee,
-                                "user_remark":leave_application.name
-                                })
-                        jv.leave_application = leave_application.name
-                        jv.save(ignore_permissions=True)
-                        jv.submit()
-                        #leave Application being set with salary slip
-                        frappe.set_value("Leave Application", leave_application.namne, "salary_slip", salary_slip.name)
-
-    salary_slip.calculate_net_pay()
-
-
-#5/12
-# This method adds the monthly ACCRUALS for Leave Salary, Airticket Payable, and EOSB Payable for each employee. 
+# This method adds the monthly ACCRUALS for Leave Salary, Airticket, EOSB, and Pension Payable for each employee. 
 # ********  Salary Slip - On Submit  ********
 def add_benefits(salary_slip, method):
+    frappe.errprint ('******** 4 ADD BENIFITS ********')
+
     emp_file = frappe.get_doc("Employee", salary_slip.employee)
     emp = frappe.get_doc("Employee", salary_slip.employee)
     leave_salary_comp = 0
@@ -438,9 +209,10 @@ def add_benefits(salary_slip, method):
     #nest_cc = frappe.get_value("Company", salary_slip.company, "cost_center")
     #*******************************************************************************************************************************
     jv = frappe.new_doc("Journal Entry")
+    jv.title = salary_slip.name + " Accruals: " + salary_slip.start_date
     jv.company = salary_slip.company
     jv.posting_date = salary_slip.posting_date
-    #if salary_slip.company == ""
+
     if salary_slip.company == "National Engineering Services & Trading Co LLC":
         jv.naming_series = "JV/HR/.YY./.####"
     if salary_slip.company == "NEST Employment Services LLC":
@@ -449,6 +221,7 @@ def add_benefits(salary_slip, method):
         jv.naming_series = "FIRMO-JV/HR/.YY./.####"
     jv.voucher_type = "Journal Entry"
     sst = frappe.get_doc("Salary Structure", salary_slip.salary_structure)
+    PFC= sst.pension_amount
     for item in sst.get("earnings"):
         if item.salary_component == "Leave Salary":
             ls = frappe.get_doc("Salary Component", "Leave Salary")
@@ -492,55 +265,8 @@ def add_benefits(salary_slip, method):
             for comp in bdt.get("accounts"):
                 if comp.company == salary_slip.company:
                     basic_ledger = comp.default_account
-        #*******************************************************************************************************************************
-        # ADDED CODE
-        #*******************************************************************************************************************************
-        if item.salary_component == "PF Contribution":
-            ls = frappe.get_doc("Salary Component", "PF Contribution")
-            PFContribution=item.amount
-            PFC=1
-            for comp in ls.get("accounts"):
-                if comp.company == salary_slip.company:
-                    PFContribution_ledger = comp.default_account
-         #*******************************************************************************************************************************
-
-    #*******************************************************************************************************************************
-    #ADDED CODE
-    #*******************************************************************************************************************************                
-    if PFC==1:
-        pension_account = frappe.get_value("Company", salary_slip.company, "default_pension_payable_account") 
-        jv.append("accounts",{
-                "account":pension_account,
-                "party_type":"Employee",
-                "party":salary_slip.employee,
-                "credit_in_account_currency": PFContribution,
-                #*******************************************************************************************************************************
-                # ADDED CODE
-                #*******************************************************************************************************************************
-                "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
-                "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
-                "employee":salary_slip.employee,
-                "user_remark":salary_slip.name
-                })
-        jv.append("accounts",{
-                "account": PFContribution_ledger,
-                "debit_in_account_currency": PFContribution,
-                #*******************************************************************************************************************************
-                #"cost_center" : nest_cc,
-                # ADDED CODE
-                #*******************************************************************************************************************************
-                "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
-                "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
-                "employee":salary_slip.employee,
-                "user_remark":salary_slip.name
-               })
-        jv.salary_slip.name
-        jv.save()
-        jv.submit()
-    #*******************************************************************************************************************************                
-
+ 
+    frappe.errprint('4. add_benefits Cost Center - ' + frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"))
 
     if emp_file.leave_salary:
         for item in salary_slip.get("earnings"):
@@ -575,9 +301,8 @@ def add_benefits(salary_slip, method):
                 "employee":salary_slip.employee,
                 "user_remark":salary_slip.name
                 })
-        jv.salary_slip.name
+        jv.salary_slip = salary_slip.name
         jv.save()
-        jv.submit()
 
 
     if emp_file.ticket_entitlement:
@@ -610,9 +335,8 @@ def add_benefits(salary_slip, method):
                 "employee":salary_slip.employee,
                 "user_remark":salary_slip.name
                 })
-        jv.salary_slip.name
+        jv.salary_slip = salary_slip.name
         jv.save()
-        jv.submit()
 
 
     if emp.eosb_selection != "EOSB Not Entitled":
@@ -633,12 +357,13 @@ def add_benefits(salary_slip, method):
         if working_years < 1:
             eosb = 0
         else:
-            eosb = min(multiplier * (min(5, (date_diff(salary_slip.posting_date, emp_file.date_of_joining) / 365)) * basic * (12 / 365) * 21) 
-            + ((max(5, (date_diff(salary_slip.posting_date, emp_file.date_of_joining) / 365)) - 5) * basic), 24 * basic)
+            eosb = min(multiplier * (min(5, (date_diff(salary_slip.end_date, emp_file.date_of_joining) / 365)) * basic * (12 / 365) * 21) 
+            + ((max(5, (date_diff(salary_slip.end_date, emp_file.date_of_joining) / 365)) - 5) * basic), 24 * basic)
 
-        old_eosb = get_balance_on(eosb_account, salary_slip.posting_date, "Employee", salary_slip.employee)
+        old_eosb = get_balance_on(eosb_account, salary_slip.end_date, "Employee", salary_slip.employee)
         old_eosb = abs(float(old_eosb))
-      
+        #frappe.errprint(old_eosb)
+        #frappe.errprint(eosb)
         post_eosb = eosb - old_eosb
 
         jv.append("accounts",{
@@ -667,9 +392,8 @@ def add_benefits(salary_slip, method):
             "employee":salary_slip.employee,
             "user_remark":salary_slip.name
             })
-        jv.salary_slip.name
+        jv.salary_slip = salary_slip.name
         jv.save()
-        jv.submit()
         
         if frappe.get_value("Employee", salary_slip.employee, "eosb_selection") == "EOSB Receivable":
             jv.append("accounts",{
@@ -698,16 +422,322 @@ def add_benefits(salary_slip, method):
                     "employee":salary_slip.employee,
                     "user_remark":salary_slip.name
                     })
-            jv.salary_slip.name
+            jv.salary_slip = salary_slip.name
             jv.save()
-            jv.submit()
+    
+    #*******************************************************************************************************************************
+    #ADDED CODE
+    #*******************************************************************************************************************************                
+    if PFC>0:
+        pension_payable = frappe.get_value("Company", salary_slip.company, "default_pension_payable_account")
+        pension_expense = frappe.get_value("Company", salary_slip.company, "default_pension_expense_account")
+        jv.append("accounts",{
+                "account":pension_payable,
+                "party_type":"Employee",
+                "party":salary_slip.employee,
+                "credit_in_account_currency": PFC,
+                #*******************************************************************************************************************************
+                # ADDED CODE
+                #*******************************************************************************************************************************
+                "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
+                "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+                "employee":salary_slip.employee,
+                "user_remark":salary_slip.name
+                })
+        jv.append("accounts",{
+                "account": pension_expense,
+                "debit_in_account_currency": PFC,
+                #*******************************************************************************************************************************
+                #"cost_center" : nest_cc,
+                # ADDED CODE
+                #*******************************************************************************************************************************
+                "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+                "department":frappe.get_value("Employee", salary_slip.employee, "department"),
+                "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+                "employee":salary_slip.employee,
+                "user_remark":salary_slip.name
+               })
+        jv.salary_slip = salary_slip.name
+        jv.save()
+    #*******************************************************************************************************************************
+    jv.submit()
+
+    salary_slip.calculate_net_pay()
+
+#5/12
+# This method adds a "Additional Salary" document as "Additional Dues" Salary Component into the "SalarySlip" against "LEAVE APPLICATIONs" Taken by the employee.
+# It depends on the Annual Leave days taken and selection of flag in the Leave application to include_all_leave_salary_and_airfare_dues_with_next_payment.
+# ********  Salary Slip - Before Save  ********
+def add_dues(salary_slip, method):
+    frappe.errprint ('******** 5 ADD DUES ********')
+    la_list = frappe.get_all('Leave Application', filters={
+                'status': 'Approved',
+                'leave_type': 'Annual Leave',
+                'employee': salary_slip.employee,
+                'docstatus':1,
+                'salary_slip':'',
+                #"from_date": ['between', salary_slip.start_date, salary_slip.end_date]
+                'from_date': ['>=', str(salary_slip.start_date)], # *******************************************************************************************************
+                'from_date': ['<=', str(salary_slip.end_date)]
+            }, fields=['name'])
+
+    frappe.errprint('Leave Applications Start Date: ' + str(salary_slip.start_date)) # ****************************************************************************************
+    frappe.errprint('Leave Applications End Date: ' + str(salary_slip.end_date))  # *******************************************************************************************
+    frappe.errprint('Leave Applications Found: ' + str(len(la_list))) # *******************************************************************************************************
+
+    for la_item in la_list:
+        frappe.errprint('Processing Leave Application: ' + str(la_item.name))  # **********************************************************************************************
+        leave_application = frappe.get_doc("Leave Application", la_item.name)
+        company = frappe.get_value("Employee", leave_application.employee, "company")
+        frappe.errprint('EMPLOYEE COMPANY: ' + company) 
+        lc = frappe.get_value("Employee", leave_application.employee, "leave_cycle")
+        ld = frappe.get_value("Leave Cycle", lc, "leave_days")
+        wd = frappe.get_value("Leave Cycle", lc, "work_days")
+        employee = frappe.get_doc("Employee", leave_application.employee)
+        lwd = employee.ticket_entitlement_workdays
+        tc = frappe.get_value("Ticket Sectors", employee.ticket_sector, "amount")
+        # TWO DIFFERENT ACCOUNTS!!
+        #account_ledger = ""
+        ls_account_ledger = ""
+        ar_account_ledger = ""
+        cpt = ""
+        ssta = frappe.get_value("Salary Structure Assignment", {"employee":leave_application.employee, "docstatus":"1"}, "salary_structure")
+        sst = frappe.get_doc("Salary Structure", ssta)
+
+        for item in sst.get("earnings"):
+            if item.salary_component == "Leave Salary":
+                sc = frappe.get_doc("Salary Component", "Leave Salary")
+                for comp in sc.get("accounts"):
+                    if comp.company == company:
+                        ls_account_ledger = comp.default_account
+                        leave_cpt = item.salary_component 
+            if item.salary_component == "Op.Leave Salary":
+                sc = frappe.get_doc("Salary Component", "Op.Leave Salary")
+                for comp in sc.get("accounts"):
+                    if comp.company == company:
+                        ls_account_ledger = comp.default_account
+                        leave_cpt = item.salary_component 
+            if item.salary_component == "Staff Airfare":
+                sc = frappe.get_doc("Salary Component", "Staff Airfare")
+                for comp in sc.get("accounts"):
+                    if comp.company == company:
+                        ar_account_ledger = comp.default_account
+                        air_cpt = item.salary_component 
+            if item.salary_component == "Op.Staff Airfare":
+                sc = frappe.get_doc("Salary Component", "Op.Staff Airfare")
+                for comp in sc.get("accounts"):
+                    if comp.company == company:
+                        ar_account_ledger = comp.default_account
+                        air_cpt = item.salary_component
+
+        ar = get_balance_on(frappe.get_value("Company", company, "default_ticket_payable_account"), leave_application.from_date, "Employee", leave_application.employee)
+        ls = get_balance_on(frappe.get_value("Company", company, "default_leave_salary_payable"), leave_application.from_date, "Employee", leave_application.employee)                  
+        frappe.errprint(str(leave_application.include_all_leave_salary_and_airfare_dues_with_next_payment))
+        frappe.errprint(leave_application.leave_type)
+        #if leave_application.include_all_leave_salary_and_airfare_dues_with_next_payment and leave_application.leave_type != "Leave Without Pay" and leave_application.leave_type != "Sick Leave":
+        #if str(leave_application.include_all_leave_salary_and_airfare_dues_with_next_payment) == '1' and leave_application.leave_type == "Annual Leave":
+        if leave_application.include_all_leave_salary_and_airfare_dues_with_next_payment and leave_application.leave_type == "Annual Leave":
+            frappe.errprint ('INSIDE LONG LEAVE')
+            # create additional salary as per total
+
+            # Leave Salary only
+            if ((ls) * -1 ) > 0:
+                sas = frappe.new_doc("Additional Salary")
+                sas.payroll_date = leave_application.from_date
+                sas.employee = leave_application.employee
+                sas.salary_component = leave_cpt
+                sas.amount = (ls) * -1
+                sas.company = company
+                sas.series = "HR-ADS-.YY.-.MM.-"
+                sas.leave_application = leave_application.name
+                sas.salary_slip = salary_slip.name
+                sas.save(ignore_permissions=True)
+                sas.submit()
+
+            # airticket only
+            if ((ar) * -1 ) > 0:
+                sas = frappe.new_doc("Additional Salary")
+                sas.payroll_date = leave_application.from_date
+                sas.employee = leave_application.employee
+                sas.salary_component = air_cpt
+                sas.amount = (ar) * -1
+                sas.company = company
+                sas.series = "HR-ADS-.YY.-.MM.-"
+                sas.leave_application = leave_application.name
+                sas.salary_slip = salary_slip.name
+                sas.save(ignore_permissions=True)
+                sas.submit()
+
+            if ((ar + ls) * -1) > 0:
+                jv = frappe.new_doc("Journal Entry")
+                jv.company = company
+                jv.posting_date = leave_application.from_date
+                jv.title = salary_slip.name + " Leave Salary: " + salary_slip.start_date
+                if company == "National Engineering Services & Trading Co LLC":
+                    jv.naming_series = "JV/HR/.YY./.####"
+                if company == "NEST Employment Services LLC":
+                    jv.naming_series = "NEE-JV/HR/.YY./.####"
+                if company == "Firmo Technical Petroleum Services LLC":
+                    jv.naming_series = "FIRMO-JV/HR/.YY./.####"
+                jv.voucher_type = "Journal Entry"
+            
+                jv.append("accounts",{
+                        "account": frappe.get_value("Company", company, "default_leave_salary_payable"),
+                        "party_type":"Employee",
+                        "party":leave_application.employee,
+                        "debit_in_account_currency": ls,
+                        #*******************************************************************************************************************************
+                        # ADDED CODE
+                        #*******************************************************************************************************************************
+                        "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+                        "department":frappe.get_value("Employee", salary_slip.employee, "department"),
+                        "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+                        "employee":salary_slip.employee,
+                        "user_remark":leave_application.name
+                        })
+                jv.append("accounts",{
+                        #"account": frappe.get_value("Company", company, "default_payroll_payable_account"),
+                        "account": ls_account_ledger,
+                        "credit_in_account_currency": ls,
+                        #*******************************************************************************************************************************
+                        # ADDED CODE
+                        #*******************************************************************************************************************************
+                        "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+                        "department":frappe.get_value("Employee", salary_slip.employee, "department"),
+                        "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+                        "employee":salary_slip.employee,
+                        "user_remark":leave_application.name
+                        })
+                jv.append("accounts",{
+                        "account": frappe.get_value("Company", company, "default_ticket_payable_account"),
+                        "party_type":"Employee",
+                        "party":leave_application.employee,
+                        "debit_in_account_currency": ar,
+                        #*******************************************************************************************************************************
+                        # ADDED CODE
+                        #*******************************************************************************************************************************
+                        "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+                        "department":frappe.get_value("Employee", salary_slip.employee, "department"),
+                        "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+                        "employee":salary_slip.employee,
+                        "user_remark":leave_application.name
+                        })
+                jv.append("accounts",{
+                        #"account": frappe.get_value("Company", company, "default_payroll_payable_account"),
+                        "account": ar_account_ledger,
+                        "credit_in_account_currency": ar,
+                        #*******************************************************************************************************************************
+                        # ADDED CODE
+                        #*******************************************************************************************************************************
+                        "divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+                        "department":frappe.get_value("Employee", salary_slip.employee, "department"),
+                        "cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+                        "employee":salary_slip.employee,
+                        "user_remark":leave_application.name
+                        })
+                jv.leave_application = leave_application.name
+                jv.salary_slip = salary_slip.name
+                jv.save(ignore_permissions=True)
+                jv.submit()
+
+                #leave Application being set with salary slip
+            frappe.errprint("Full Leave: Adding to Leave Application " + str(leave_application.name) + " a salary_slip " + str(salary_slip.name))
+            frappe.set_value("Leave Application", leave_application.name, "salary_slip", salary_slip.name)
+
+
+        # if not collect all balances
+        else:
+            #if leave_application.leave_type != "Sick Leave" and leave_application.leave_type != "Leave Without Pay":
+            if leave_application.leave_type == "Annual Leave":
+                ssa_list = frappe.get_all("Salary Structure Assignment", filters={"employee": leave_application.employee}, fields=["name", "salary_structure"], order_by="creation desc")
+                lsal = 0
+                asal = 0
+                    
+                sst = frappe.get_doc("Salary Structure", ssa_list[0].salary_structure)
+                for item in sst.get("earnings"):
+                    if frappe.get_value("Salary Component", item.salary_component, "include_in_leave_salary_provision") == 1:
+                        lsal += item.amount
+                    if frappe.get_value("Salary Component", item.salary_component, "include_in_airfare_provision") == 1:
+                        asal += item.amount
+
+                lscal = min(round((leave_application.total_leave_days / float(ld) * lsal) * 100) / 100, abs(ls))
+                arcal = min(round((leave_application.total_leave_days / float(lwd)) * float(tc) * 100) / 100, abs(ar))
+
+                if (lscal) > 0:
+                    sas = frappe.new_doc("Additional Salary")
+                    sas.payroll_date = leave_application.from_date
+                    sas.employee = leave_application.employee
+                    sas.salary_component = leave_cpt
+                    sas.amount = lscal
+                    sas.company = company
+                    sas.leave_application = leave_application.name
+                    sas.salary_slip = salary_slip.name
+                    sas.overwrite_salary_structure_amount = 1
+                    sas.series = "HR-ADS-.YY.-.MM.-"
+                    sas.save(ignore_permissions=True)
+                    sas.submit()
+
+                    # ***************************************************            ************************************                 **********************************
+                    frappe.errprint(leave_application.employee)
+                    frappe.errprint(frappe.get_value("Employee", leave_application.employee, "department"))
+                    frappe.errprint(frappe.get_value("Department", frappe.get_value("Employee", leave_application.employee, "department"), "cost_center"))
+
+                    jv = frappe.new_doc("Journal Entry")
+                    jv.company = company
+                    jv.posting_date = leave_application.from_date
+                    jv.title = salary_slip.name + " Leave Salary: " + salary_slip.start_date
+                    if company == "National Engineering Services & Trading Co LLC":
+                        jv.naming_series = "JV/HR/.YY./.####"
+                    if company == "NEST Employment Services LLC":
+                        jv.naming_series = "NEE-JV/HR/.YY./.####"
+                    if company == "Firmo Technical Petroleum Services LLC":
+                        jv.naming_series = "FIRMO-JV/HR/.YY./.####"
+                    jv.voucher_type = "Journal Entry"
+                    if (lscal) > 0:
+                        jv.append("accounts",{
+                                "account": frappe.get_value("Company", company, "default_leave_salary_payable"),
+                                "party_type":"Employee",
+                                "party":leave_application.employee,
+                                "debit_in_account_currency": lscal
+                                })        
+                        jv.append("accounts",{
+                                "account": ls_account_ledger,
+                                "credit_in_account_currency": lscal,
+                                #*******************************************************************************************************************************
+                                # ADDED CODE
+                                #*******************************************************************************************************************************
+                                "divisions": frappe.get_value("Department", frappe.get_value("Employee", leave_application.employee, "department"), "division"),
+                                "department":frappe.get_value("Employee", leave_application.employee, "department"),
+                                "cost_center":frappe.get_value("Department", frappe.get_value("Employee", leave_application.employee, "department"), "cost_center"),
+                                "employee":leave_application.employee,
+                                "user_remark":leave_application.name
+                                })
+                        jv.leave_application = leave_application.name
+                        jv.salary_slip = salary_slip.name
+                        jv.save(ignore_permissions=True)
+                        jv.submit()
+                        #leave Application being set with salary slip
+                        frappe.errprint("Short Leave: Adding to Leave Application " + str(leave_application.name) + " a salary_slip " + str(salary_slip.name))
+                        frappe.set_value("Leave Application", leave_application.name, "salary_slip", salary_slip.name)
 
     #Inter Company
+    jv = frappe.new_doc("Journal Entry")
+    jv.title = salary_slip.name + " Inter Company: " + salary_slip.start_date
+    jv.company = salary_slip.company
+    jv.posting_date = salary_slip.posting_date
+    if frappe.get_value("Employee",salary_slip.employee, "sponsoring_company") == "National Engineering Services & Trading Co LLC":
+        jv.naming_series = "JV/HR/.YY./.####"
+    if frappe.get_value("Employee",salary_slip.employee, "sponsoring_company") == "NEST Employment Services LLC":
+        jv.naming_series = "NEE-JV/HR/.YY./.####"
+    if frappe.get_value("Employee",salary_slip.employee, "sponsoring_company") == "Firmo Technical Petroleum Services LLC":
+        jv.naming_series = "FIRMO-JV/HR/.YY./.####"
+    jv.voucher_type = "Journal Entry"
     o_comp = frappe.get_value("Employee", salary_slip.employee, "company")
     o_comp_doc = frappe.get_doc("Company",o_comp )
     s_comp = frappe.get_value("Employee", salary_slip.employee, "sponsoring_company")
     s_comp_doc = frappe.get_doc("Company", s_comp)
-    s_comp_ledger = ""
+    s_comp_ledger = "" #**********************************************************************************************     MISSING !!!!    ***********************************
     salary_payable_ledger = frappe.get_value("Company",salary_slip.company, "default_payroll_payable_account")
 
     if salary_slip.company != s_comp:
@@ -716,12 +746,12 @@ def add_benefits(salary_slip, method):
                 s_comp_ledger = item.receivable_account
 
         jv.append("accounts",{
-                    "account":salary_payable_ledger,
+                    "account": s_comp_ledger,
                     "credit_in_account_currency": salary_slip.net_pay,
                     "user_remark":salary_slip.name
                     })
         jv.append("accounts",{
-                    "account": s_comp_ledger,
+                    "account": salary_payable_ledger,
                     "party_type":"Employee",
                     "party":salary_slip.employee,
                     "debit_in_account_currency": salary_slip.net_pay,
@@ -734,11 +764,11 @@ def add_benefits(salary_slip, method):
                     "employee":salary_slip.employee,
                     "user_remark":salary_slip.name
                     })
-        jv.salary_slip.name
+        jv.salary_slip = salary_slip.name
         jv.save()
         jv.submit()
 
-        o_comp_ledger = ""
+        o_comp_ledger = "" #**********************************************************************************************     MISSING !!!!    ***********************************
         salary_payable_ledger = frappe.get_value("Company",frappe.get_value("Employee",salary_slip.employee, "sponsoring_company"), "default_payroll_payable_account")
 
         for item in s_comp_doc.get("related_parties_receivable_account"):
@@ -746,6 +776,7 @@ def add_benefits(salary_slip, method):
                 o_comp_ledger = item.receivable_account
 
         jv = frappe.new_doc("Journal Entry")
+        jv.title = salary_slip.name + " Inter Company: " + salary_slip.start_date
         jv.company = frappe.get_value("Employee",salary_slip.employee, "sponsoring_company")
         jv.posting_date = salary_slip.posting_date
         if frappe.get_value("Employee",salary_slip.employee, "sponsoring_company") == "National Engineering Services & Trading Co LLC":
@@ -757,7 +788,7 @@ def add_benefits(salary_slip, method):
         jv.voucher_type = "Journal Entry"
 
         jv.append("accounts",{
-                    "account":salary_payable_ledger,
+                    "account":o_comp_ledger,
                     "debit_in_account_currency": salary_slip.net_pay,
                     "party_type":"Employee",
                     "party":salary_slip.employee,
@@ -769,23 +800,24 @@ def add_benefits(salary_slip, method):
                     
                     })
         jv.append("accounts",{
-                    "account": o_comp_ledger,
-                    
+                    "account": salary_payable_ledger,
                     "credit_in_account_currency": salary_slip.net_pay,
                     "user_remark":salary_slip.name
                     })
-        jv.salary_slip.name
+        jv.salary_slip = salary_slip.name
         jv.save()
         jv.submit()
 
     salary_slip.calculate_net_pay()
+    salary_slip.save()
+    salary_slip.reload()
 
 #6/12
 # This adds the employees monthly Accrued Leave DAYS entry in the leave days ledger.
 # ********  Salary Slip - On Submit  ********
 @frappe.whitelist()  # WHY whitelist it?? 
 def allocate_leave(salary_slip, method):
-    for item in frappe.get_all("Employee", filters={"status": "Active",  "leave_salary": 1}, fields=["name"]):
+    for item in frappe.get_all("Employee", filters={"status": "Active",  "leave_salary": 1, "Employee": salary_slip.employee}, fields=["name"]): # FIXED NOW *********************   ALL EMPLOYEES !!!    *******************
         emp = frappe.get_doc("Employee", item.name)
         mldays = 0
         if emp.leave_cycle:
@@ -794,48 +826,70 @@ def allocate_leave(salary_slip, method):
             #*******************************************************************************************************************************
             # CHANGED 'item' below to 'item1' not to conflict with 'item' in the above loop
             #******************************************************************************************
-            d = datetime.datetime.now()
-            lc_month = d.strftime("%m")
+            d = salary_slip.start_date # datetime.now()
+            lc_month = d[5:7] #d.strftime("%m")
+            frappe.errprint (d)
+            frappe.errprint (lc_month)
             for iteml in lc.get("monthly_leave"):
-                if iteml.month == lc_month:
+                if int(iteml.month) == int(lc_month):
                     mldays = iteml.leaves
-
-            l_days = round((salary_slip.payment_days / float(salary_slip.total_working_days)) * float(mldays) * 2) / 2
+            l_days = round((float(salary_slip.payment_days) / float(salary_slip.total_working_days)) * float(mldays) * 2) / 2
             la_list = frappe.get_all("Leave Ledger Entry", filters={"employee": emp.name,  "leave_type": "Annual Leave", "transaction_type":"Leave Allocation"}, fields=["transaction_name", "from_date", "to_date"], order_by="creation desc")
             if la_list:
                 ll = frappe.new_doc("Leave Ledger Entry")
                 ll.employee = emp.name
                 ll.leave_type = "Annual Leave"
-                ll.transaction_type = "Leave Allocation"
-                ll.transaction_name = la_list[0].transaction_name
+                ll.transaction_type = "Salary Slip" # "Leave Allocation"
+                ll.transaction_name = salary_slip.name # la_list[0].transaction_name
                 ll.from_date = la_list[0].from_date
                 ll.to_date = la_list[0].to_date
                 ll.leaves = l_days
                 ll.save()
-                frappe.errprint("Generated Leave Days")
-                frappe.errprint(emp.name)
-                frappe.errprint(l_days)
+                #ll.submit()            SHOULD BE SUBMITTED AT SALARY PAYMENT,,,, MAYBE!
+
+            #frappe.errprint("mldays " + str(mldays))
+            #frappe.errprint("payment days " + str(salary_slip.payment_days))
+            #frappe.errprint("Total Working days " + str(salary_slip.total_working_days))
+            #frappe.errprint("Generated Leave Days")
+            #frappe.errprint(emp.name)
+            #frappe.errprint(l_days)
 
 #7/12
 # This code cancels and Unmarks the "Expense Claim" and "Leave Application" documents if the "SalarySlip" is Cancelled.
 # ********  Salary Slip - On Cancel  ********
 def cancel_salary_slip(salary_slip, method):
     for item in frappe.get_all("Expense Claim", filters={"salary_slip": salary_slip.name}, fields=["name"]):
+        frappe.errprint('Unmark: Found Expense Claim ' + str(item.name)) #*********************************************************************************************************************
         frappe.set_value("Expense Claim", item.name, "salary_slip", "")
-        #frappe.set_value("Expense Claim", item.name, "added_to_salary_slip", "0")
         frappe.set_value("Expense Claim", item.name, "status", "Unpaid")
 
     for item in frappe.get_all("Leave Application", filters={"salary_slip": salary_slip.name}, fields=["name"]):
+        frappe.errprint('Unmark: Found Leave Application ' + str(item.name)) #*********************************************************************************************************************
         frappe.set_value("Leave Application", item.name, "salary_slip", "")
         for item1 in frappe.get_all("Additional Salary", filters={"leave_application": item.name}, fields=["name"]):
+            frappe.errprint('Delete: Found LA Additional Salaries ' + str(item1.name)) #*********************************************************************************************************************
             a_s=frappe.get_doc("Additional Salary", item1.name)
             a_s.cancel()
-            #a_s.delete()
+            a_s.delete()
 
     for item in frappe.get_all("Journal Entry", filters={"salary_slip": salary_slip.name}, fields=["name"]):
+        frappe.errprint('Delete: Found JV ' + str(item.name)) #*********************************************************************************************************************
         jv=frappe.get_doc("Journal Entry", item.name)
         jv.cancel()
-        #jv.delete()
+        jv.delete()
+
+    for item in frappe.get_all("Additional Salary", filters={"salary_slip": salary_slip.name}, fields=["name"]):
+        frappe.errprint('Delete: Found AdditionalSalaries ' + str(item.name)) #*********************************************************************************************************************
+        a_s=frappe.get_doc("Additional Salary", item.name)
+        a_s.cancel()
+        a_s.delete()
+
+    for item in frappe.get_all("Leave Ledger Entry", filters={"transaction_type": "Salary Slip", "transaction_name": salary_slip.name}, fields=["name"]):
+        frappe.errprint('Delete: Found Leave Ledger Entries ' + str(item.name)) #*********************************************************************************************************************
+        ll=frappe.get_doc("Leave Ledger Entry", item.name)
+        #ll.cancel()
+        ll.delete()
+
 #8/12
 # This creates the INTERCOMPANY Transactions when submitting "Salary Payment" Document.
 #  ********  Payroll Payment  ********
@@ -1104,7 +1158,8 @@ def mark_absent(leave_application, method):
 # ********  Expense Claim - On Cancel  ********
 def cancel_expense_claim(expense_claim, method):
     if expense_claim.salary_slip:
-        frappe.errprint('Please cancel the associated Salary Slip prior to canceling this document.')
+        #frappe.errprint('Please cancel the associated Salary Slip prior to canceling this document.')
+        frappe.throw('Please cancel the associated Salary Slip prior to canceling this document.')
 
 #12/12
 # This function cancels "Additional Salary" associated with Submitted "Timesheet"

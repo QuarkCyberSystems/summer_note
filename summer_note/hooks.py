@@ -131,10 +131,10 @@ doc_events = {
         "on_cancel": "summer_note.common.cancel_dues" #2/12
     },
     "Salary Slip": {
-        "before_save": ["summer_note.common.add_expense_claim", "summer_note.common.add_benefits", "summer_note.common.add_dues"], #3/12, #5/12, 4/12
+        "after_insert": ["summer_note.common.add_expense_claim", "summer_note.common.add_benefits", "summer_note.common.add_dues"], #3/12, #4/12, 5/12
         "on_submit":  "summer_note.common.allocate_leave", # 6/12
         "on_cancel": "summer_note.common.cancel_salary_slip", #7/12
-        "on_trash": "summer_note.common.cancel_salary_slip"
+        "on_trash": "summer_note.common.cancel_salary_slip" #7/12
         },
     "Expense Claim": {
         "on_cancel": "summer_note.common.cancel_expense_claim" #11/12
