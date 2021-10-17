@@ -59,7 +59,8 @@
   {
    "fieldname": "unpaid_salaries",
    "fieldtype": "Table",
-   "options": "Unpaid Salary Slips"
+   "options": "Unpaid Salary Slips",
+   "read_only": 1
   },
   {
    "fieldname": "department",
@@ -80,7 +81,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2021-08-01 11:23:50.726088",
+ "modified": "2021-10-17 20:23:45.990839",
  "modified_by": "Administrator",
  "module": "Summer Note",
  "name": "Salary Payment",

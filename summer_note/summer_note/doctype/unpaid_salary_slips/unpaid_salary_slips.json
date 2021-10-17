@@ -16,37 +16,46 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Employee",
-   "options": "Employee"
+   "options": "Employee",
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Employee Name"
+   "label": "Employee Name",
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "salary_slip",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Salary Slip",
-   "options": "Salary Slip"
+   "options": "Salary Slip",
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "net_pay",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Net Pay"
+   "label": "Net Pay",
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "department",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Department",
-   "options": "Department"
+   "options": "Department",
+   "read_only": 1
   }
  ],
  "istable": 1,
- "modified": "2021-04-19 08:49:14.237179",
+ "modified": "2021-10-17 20:29:43.224679",
  "modified_by": "Administrator",
  "module": "Summer Note",
  "name": "Unpaid Salary Slips",

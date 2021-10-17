@@ -67,10 +67,12 @@ def cancel_dues(leave_application, method):
     for item in frappe.get_all("Additional Salary", filters={"leave_application": leave_application.name}, fields=["name"]):
         a_s = frappe.get_doc("Additional Salary", item.name)
         a_s.cancel()
+        a_s.delete()
 
     for item in frappe.get_all("Journal Entry", filters={"leave_application": leave_application.name}, fields=["name"]):
         a_s = frappe.get_doc("Journal Entry", item.name)
         a_s.cancel()
+        a_s.delete()
 
 #3/12
 # This code adds an "Expense Claim" Entry under PAYROLL CONTROL Account, to be reversed during Posting/Submission of Payroll Slips.
@@ -837,7 +839,7 @@ def allocate_leave(salary_slip, method):
             #*******************************************************************************************************************************
             # CHANGED 'item' below to 'item1' not to conflict with 'item' in the above loop
             #******************************************************************************************
-            d = salary_slip.start_date # datetime.now()
+            d = str(salary_slip.start_date) # datetime.now()
             lc_month = d[5:7] #d.strftime("%m")
             frappe.errprint (d)
             frappe.errprint (lc_month)
@@ -856,7 +858,7 @@ def allocate_leave(salary_slip, method):
                 ll.to_date = la_list[0].to_date
                 ll.leaves = l_days
                 ll.save()
-                #ll.submit()            SHOULD BE SUBMITTED AT SALARY PAYMENT,,,, MAYBE!
+                #ll.submit()            SHOULD BE SUBMITTED AT SALARY PAYMENT,,,,!
 
             #frappe.errprint("mldays " + str(mldays))
             #frappe.errprint("payment days " + str(salary_slip.payment_days))
@@ -894,8 +896,8 @@ def cancel_salary_slip(salary_slip, method):
         a_s=frappe.get_doc("Additional Salary", item.name)
         a_s.cancel()
         a_s.delete()
-
-    for item in frappe.get_all("Leave Ledger Entry", filters={"transaction_type": "Salary Slip", "transaction_name": salary_slip.name}, fields=["name"]):
+    
+    for item in frappe.get_all("Leave Ledger Entry", filters={"transaction_type": "Salary Slip", "transaction_name": salary_slip.name, 'docstatus':0}, fields=["name"]):
         frappe.errprint('Delete: Found Leave Ledger Entries ' + str(item.name)) #*********************************************************************************************************************
         ll=frappe.get_doc("Leave Ledger Entry", item.name)
         #ll.cancel()
@@ -1176,6 +1178,9 @@ def cancel_expense_claim(expense_claim, method):
 # This function cancels "Additional Salary" associated with Submitted "Timesheet"
 # ********  Timesheet - On Cancel  ********
 def cancel_timesheet(timesheet, method):
-    for item in frappe.get_all("Addtional Salary", filters={"timesheet": timesheet.name}, fields=["name"]):
-        a_s=frappe.get_doc("Additional Salary", item.name)
-        a_s.cancel()
+    if timesheet.salary_slip:
+        frappe.throw('Please cancel the associated Salary Slip prior to canceling this document.')
+    else:
+        for item in frappe.get_all("Addtional Salary", filters={"timesheet": timesheet.name}, fields=["name"]):
+            a_s=frappe.get_doc("Additional Salary", item.name)
+            a_s.cancel()
