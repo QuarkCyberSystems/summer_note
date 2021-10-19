@@ -853,14 +853,16 @@ def allocate_leave(salary_slip, method):
                 "transaction_type":"Leave Allocation"
                 }, fields=["transaction_name", "from_date", "to_date"], order_by="creation desc")
             if la_list:
+                
                 ll = frappe.new_doc("Leave Ledger Entry")
                 ll.employee = emp.name
+                lp = frappe.get_all("Leave Period", filters={"company":salary_slip.company, "is_active":1}, fields=["name", "from_date", "to_date"])
                 ll.leave_type = "Annual Leave"
                 ll.transaction_type = "Leave Allocation"
                 ll.transaction_name = la_list[0].transaction_name       #       **************************   WHY THIS ????? *********************
                 ll.salary_slip = salary_slip.name
-                ll.from_date = la_list[0].from_date                     #       **************************   WHY THIS ????? *********************
-                ll.to_date = la_list[0].to_date                         #       **************************   WHY THIS ????? *********************
+                ll.from_date = lp[0].from_date                     #       **************************   WHY THIS ????? *********************
+                ll.to_date = lp[0].to_date                         #       **************************   WHY THIS ????? *********************
                 ll.leaves = l_days
                 ll.save()
                 #ll.submit()            SHOULD BE SUBMITTED AT SALARY PAYMENT,,,,!
@@ -981,15 +983,22 @@ def cancel_timesheet(timesheet, method):
 # then it Cancels the Payroll Entry.
 # ********  Payroll Entry - On Cancel  ********
 def cancel_payroll_entry(payroll_entry, method):
-    ss_list = frappe.get_all('Salary Slip', filters={
+    sss_list = frappe.get_all('Salary Slip', filters={
                     'docstatus': 1,
                     'payroll_entry': payroll_entry.name,
                     'salary_payment': ["!=", ''],
                 }, fields=['name'])
-    if ss_list:
+    if sss_list:
         frappe.throw('Please cancel the associated Salary Payment first, prior to canceling this document.')
     else:
-        frappe.message('Please cancel the Generated Journal Entry from the System.')
+        css_list = frappe.get_all('Salary Slip', filters={
+                    'docstatus': 1,
+                    'payroll_entry': payroll_entry.name,
+                    'salary_payment': '',
+            }, fields=['name'])
+        if css_list:
+            frappe.msgprint('Please cancel the Generated Journal Entry from the System.')
+
 
 #13/13
 # ****************************   DISABLED   **********************************************************************
@@ -1005,4 +1014,4 @@ def delete_payroll_entry(payroll_entry, method):
     if ss_list:
         frappe.throw('Please cancel the associated Salary Payment first, prior to canceling this document.')
     else:
-        frappe.message('Please cancel the Generated Journal Entry from the System.')
+        frappe.msgprint('Please cancel the Generated Journal Entry from the System.')

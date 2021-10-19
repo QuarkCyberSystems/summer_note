@@ -306,9 +306,9 @@ class SalaryPayment(Document):
 
     # 4/4
     # This method unmarks all selected 'Salary Slip' documents, and Cancels and Deletes all Journal Entries created with this Salary Payment.
-    def on_trash(self):
-        #self.my_clear()
-        frappe.errprint("before_trash")
+    #def on_trash(self):
+    #    #self.my_clear()
+    #    frappe.errprint("before_trash")
 
 
     def my_clear(self):
@@ -332,7 +332,7 @@ class SalaryPayment(Document):
             frappe.errprint(ss)
             for lle in frappe.get_all('Leave Ledger Entry', filters={
                 'docstatus': 1, # Submitted
-                'salary_slip' : ss.name
+                'salary_slip' : ss #ss.name
                 }, fields=['name', 'employee', 'leave_type', 'salary_slip', 'from_date', 'to_date', 'leaves']):
 
                 frappe.errprint('Found LLEs.')
