@@ -124,24 +124,28 @@ app_include_css = [
 
 doc_events = {
     "Timesheet": {
-        "on_submit": "summer_note.common.ot_timesheet", #1/12
-        "on_cancel": "summer_note.common.cancel_timesheet" #12/12
+        "on_submit": "summer_note.common.ot_timesheet", #1/13
+        "on_cancel": "summer_note.common.cancel_timesheet" #11/13
     },
     "Leave Application": {
-        "on_cancel": "summer_note.common.cancel_dues" #2/12
+        "on_cancel": "summer_note.common.cancel_dues" #2/13
     },
     "Salary Slip": {
         "after_insert": ["summer_note.common.add_expense_claim", "summer_note.common.add_benefits", 
-        "summer_note.common.add_dues", "summer_note.common.allocate_leave"], #3/12, #4/12, 5/12, 6/12
-        #"on_submit":  "summer_note.common.allocate_leave", # 6/12
-        "on_cancel": "summer_note.common.cancel_salary_slip", #7/12
-        "on_trash": "summer_note.common.cancel_salary_slip" #7/12
+        "summer_note.common.add_dues", "summer_note.common.allocate_leave"], #3/13, #4/13, 5/13, 6/13
+        #"on_submit":  "summer_note.common.allocate_leave", # 6/13
+        "on_cancel": "summer_note.common.cancel_salary_slip", #7/13
+        "on_trash": "summer_note.common.cancel_salary_slip" #7/13
         },
     "Expense Claim": {
-        "on_cancel": "summer_note.common.cancel_expense_claim" #11/12
+        "on_cancel": "summer_note.common.cancel_expense_claim" #10/13
     },
     "Sales Order": {
-        "before_submit": "summer_note.common.add_project" #9/12
+        "before_submit": "summer_note.common.add_project" #8/13
+    },
+    "Payroll Entry": {
+        "on_cancel": "summer_note.common.cancel_payroll_entry", #12/13
+        # "on_trash" : "summer_note.common.delete_payroll_entry" #7/13
     }
 }
 
@@ -154,7 +158,7 @@ scheduler_events = {
 # 		"summer_note.tasks.all"
 # 	],
  	"daily": [
- 		"summer_note.common.mark_absent"
+ 		"summer_note.common.mark_absent" # 9/13
  	]
 # 	"hourly": [
 # 		"summer_note.tasks.hourly"

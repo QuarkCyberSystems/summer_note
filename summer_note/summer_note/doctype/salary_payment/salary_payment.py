@@ -20,7 +20,7 @@ class SalaryPayment(Document):
                 ss = frappe.get_all("Salary Slip", filters={
                     "docstatus": "1",  
                     "start_date": (">=", self.posting_date), 
-                    "payroll_entry": ["!=", ''], # *********************************  ADDED CONDITION  DOES NOT WORK !!!********************************
+                    "payroll_entry": ["!=", ''], # *********************************  ADDED CONDITION  !!!********************************
                     #"salary_payment":("=", ""), 
                     "salary_payment":'',
                     "sponsoring_company": self.company, 
@@ -40,7 +40,7 @@ class SalaryPayment(Document):
                 ss = frappe.get_all("Salary Slip", filters={
                     "docstatus": "1",  
                     "start_date": (">=", self.posting_date),
-                    "payroll_entry": ["!=", ''], # *********************************  ADDED CONDITION  DOES NOT WORK !!!********************************
+                    "payroll_entry": ["!=", ''], # *********************************  ADDED CONDITION  !!!********************************
                     #"salary_payment": ("=", ""), 
                     "salary_payment":'',
                     "sponsoring_company": self.company
@@ -59,7 +59,7 @@ class SalaryPayment(Document):
             total = 0            
             for item in self.get("unpaid_salaries"):
                 total += item.net_pay
-                frappe.errprint(item.net_pay)
+                #frappe.errprint(item.net_pay)
             self.total = total                
 
     # 2/4
@@ -106,29 +106,36 @@ class SalaryPayment(Document):
                     rec_ledger = ""
                     work_rec_ledger = ""
                     spon_comp = frappe.get_doc("Company", frappe.get_value("Employee", item.employee, "sponsoring_company"))
+                    frappe.errprint('spon_company - ' + spon_comp.name)
                     working_comp = frappe.get_doc("Company", frappe.get_value("Employee", item.employee, "company"))
+                    frappe.errprint('working_company - ' + working_comp.name)
 
                     for led in spon_comp.get("related_parties_receivable_account"):
+                        #led.company = 
                         if led.company == frappe.get_value("Employee", item.employee, "company"):
                             rec_ledger = led.receivable_account
+                            frappe.errprint('rec - ' + rec_ledger)
 
                     for led in working_comp.get("related_parties_receivable_account"):
                         if led.company == frappe.get_value("Employee", item.employee, "sponsoring_company"):
                             working_rec_ledger = led.receivable_account
+                            frappe.errprint('working_rec - ' + working_rec_ledger)
 
                     frappe.errprint('Inter-Company Transaction Company: ' + working_comp.name)
 
                     if working_comp.name == "National Engineering Services & Trading Co LLC":        
                         frappe.errprint("working_comp")    
                         nest_jv.append("accounts",{
-                                    "account": working_rec_ledger,
+                                    "account": rec_ledger,
                                     "credit_in_account_currency": item.net_pay,
+                                    "cost_center": frappe.get_value("Company", working_comp.company, "cost_center"),
                                     "party_type":"Employee",
                                     "party":item.employee,
                                     "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
                                     })
                         nest_jv.append("accounts",{
                                     "account": frappe.get_value("Company", spon_comp.name, "default_payroll_payable_account") ,
+                                    "cost_center": frappe.get_value("Company", working_comp.company, "cost_center"),
                                     "debit_in_account_currency": item.net_pay,
                                     "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
                                     })
@@ -141,6 +148,7 @@ class SalaryPayment(Document):
                             
                         nest_jv.append("accounts",{
                                     "account": rec_ledger,
+                                    "cost_center": frappe.get_value("Company", self.company, "cost_center"),
                                     "debit_in_account_currency": item.net_pay,
                                     "party_type":"Employee",
                                     "party":item.employee,
@@ -148,6 +156,7 @@ class SalaryPayment(Document):
                                     })
                         nest_jv.append("accounts",{
                                     "account": self.bank_cash_account ,
+                                    "cost_center": frappe.get_value("Company", self.company, "cost_center"),
                                     "credit_in_account_currency": item.net_pay,
                                     "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
                                     })
@@ -160,6 +169,7 @@ class SalaryPayment(Document):
                         frappe.errprint("working_comp")    
                         nees_jv.append("accounts",{
                                     "account": working_rec_ledger,
+                                    "cost_center": frappe.get_value("Company", working_comp.company, "cost_center"),
                                     "credit_in_account_currency": item.net_pay,
                                     "party_type":"Employee",
                                     "party":item.employee,
@@ -167,6 +177,7 @@ class SalaryPayment(Document):
                                     })
                         nees_jv.append("accounts",{
                                     "account": frappe.get_value("Company", spon_comp.name, "default_payroll_payable_account") ,
+                                    "cost_center": frappe.get_value("Company", self.company, "cost_center"),
                                     "debit_in_account_currency": item.net_pay,
                                     "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
                                     })
@@ -179,6 +190,7 @@ class SalaryPayment(Document):
                             
                         nees_jv.append("accounts",{
                                     "account": rec_ledger,
+                                    "cost_center": frappe.get_value("Company", self.company, "cost_center"),
                                     "debit_in_account_currency": item.net_pay,
                                     "party_type":"Employee",
                                     "party":item.employee,
@@ -186,6 +198,7 @@ class SalaryPayment(Document):
                                     })
                         nees_jv.append("accounts",{
                                     "account": self.bank_cash_account ,
+                                    "cost_center": frappe.get_value("Company", self.company, "cost_center"),
                                     "credit_in_account_currency": item.net_pay,
                                     "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
                                     })
@@ -199,13 +212,15 @@ class SalaryPayment(Document):
                         frappe.errprint("working_comp")    
                         fir_jv.append("accounts",{
                                     "account": working_rec_ledger,
+                                    "cost_center": frappe.get_value("Company", working_comp.name, "cost_center"),
                                     "credit_in_account_currency": item.net_pay,
                                     "party_type":"Employee",
                                     "party":item.employee,
                                     "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
                                     })
                         fir_jv.append("accounts",{
-                                    "account": frappe.get_value("Company", spon_comp.name, "default_payroll_payable_account") ,
+                                    "account": frappe.get_value("Company", working_comp.name, "default_payroll_payable_account"),
+                                    "cost_center": frappe.get_value("Company", working_comp.name, "cost_center"),
                                     "debit_in_account_currency": item.net_pay,
                                     "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
                                     })
@@ -217,6 +232,7 @@ class SalaryPayment(Document):
                             
                         fir_jv.append("accounts",{
                                     "account": rec_ledger,
+                                    "cost_center": frappe.get_value("Company", self.company, "cost_center"),
                                     "debit_in_account_currency": item.net_pay,
                                     "party_type":"Employee",
                                     "party":item.employee,
@@ -224,6 +240,7 @@ class SalaryPayment(Document):
                                     })
                         fir_jv.append("accounts",{
                                     "account": self.bank_cash_account ,
+                                    "cost_center": frappe.get_value("Company", self.company, "cost_center"),
                                     "credit_in_account_currency": item.net_pay,
                                     "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
                                     })
@@ -278,36 +295,53 @@ class SalaryPayment(Document):
             for lle in frappe.get_all("Leave Ledger Entry", filters={"transaction_name": item.salary_slip, "docstatus": 0}, fields=["name"]):
                 frappe.errprint("LLE Found")
                 lle_doc = frappe.get_doc("Leave Ledger Entry", lle.name)
+                lle_doc.save()
                 lle_doc.submit()
 
     # 3/4
     # This method unmarks all selected 'Salary Slip' documents, and Cancels and Deletes all Journal Entries created with this Salary Payment.
     # ********  Salary Payment - On Cancel  ********
     def on_cancel(self):
+        self.my_clear()
+
+    # 4/4
+    # This method unmarks all selected 'Salary Slip' documents, and Cancels and Deletes all Journal Entries created with this Salary Payment.
+    def on_trash(self):
+        #self.my_clear()
+        frappe.errprint("before_trash")
+
+
+    def my_clear(self):
         for item in self.get("unpaid_salaries"):
+            frappe.errprint('Clearing Salary Slip link to this Salary Payment for ' + item.employee_name)
             frappe.db.set_value("Salary Slip", item.salary_slip,"salary_payment", "")
+        frappe.errprint('Done - Clearing Salary Slip link to this Salary Payment.')
         for item in frappe.get_all('Journal Entry', filters={'docstatus': 1, 'salary_payment': self.name}, fields=['name']):
+            frappe.errprint('Cancelling and Deleting all Salary Payment related JVs ' + item.name)
             jv = frappe.get_doc("Journal Entry", item.name)
             jv.cancel() # ******************************************* Re-Enabled ***************************************
             jv.delete() # ******************************************* Added Line ***************************************
-        
+        frappe.errprint('Done - Cancelling and Deleting all Salary Payment related JVs')
+
         # Create reversal entries in Leave Ledger Entry against all submitted entries related to this Salary Payment and Submit the same
         # Then, Create new set of Ledger Entries in Draft Mode.
         # frappe.msgprint('Cancelling Salary Payment does not cancel Leave Ledger Entries Created during Payroll Entry Process. Please Create Negative days entries in the leave ledger accordingly.')
         for item in self.get("unpaid_salaries"):
             frappe.errprint('Reversing LLE and regenerating for ' + item.employee_name)
+            ss=item.salary_slip
+            frappe.errprint(ss)
             for lle in frappe.get_all('Leave Ledger Entry', filters={
                 'docstatus': 1, # Submitted
-                'transaction_type': 'Salary Slip', 
-                'transaction_name' : item.salary_slip
-                }, fields=['name', 'employee', 'leave_type', 'transaction_type', 'transaction_name', 'from_date', 'to_date', 'leaves']):
+                'salary_slip' : ss.name
+                }, fields=['name', 'employee', 'leave_type', 'salary_slip', 'from_date', 'to_date', 'leaves']):
 
+                frappe.errprint('Found LLEs.')
+                
                 # 1- Negative Entries SUBMITTED
                 ll = frappe.new_doc("Leave Ledger Entry")
                 ll.employee = lle.employee
                 ll.leave_type = lle.leave_type
-                ll.transaction_type = lle.transaction_type
-                ll.transaction_name = lle.transaction_name
+                ll.salary_slip = lle.salary_slip
                 ll.from_date = lle.from_date
                 ll.to_date = lle.to_date
                 ll.leaves = -lle.leaves
@@ -318,14 +352,10 @@ class SalaryPayment(Document):
                 ll = frappe.new_doc("Leave Ledger Entry")
                 ll.employee = lle.employee
                 ll.leave_type = lle.leave_type
-                ll.transaction_type = lle.transaction_type
-                ll.transaction_name = lle.transaction_name
+                ll.salary_slip = lle.salary_slip
                 ll.from_date = lle.from_date
                 ll.to_date = lle.to_date
                 ll.leaves = lle.leaves
                 ll.save()
-                
-    # 4/4
-    # This method unmarks all selected 'Salary Slip' documents, and Cancels and Deletes all Journal Entries created with this Salary Payment.
-    def on_trash(self):
-        self.on_cancel()
+
+        frappe.errprint('Done - Reversal and regeneration of LLEs.')    
