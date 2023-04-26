@@ -10,7 +10,7 @@ import frappe, requests, urllib3, json, dateutil.parser, urllib, dateutil.relati
 from frappe.model.document import Document
 from frappe.model.naming import make_autoname
 from frappe.utils import flt, add_days, date_diff, get_request_site_address, formatdate, getdate, month_diff, today, get_link_to_form, get_url_to_form
-from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
+from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
 from erpnext.accounts.utils import get_balance_on
 from json import dumps
 from datetime import date, timedelta, datetime
