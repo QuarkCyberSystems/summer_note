@@ -1,0 +1,56 @@
+{
+ "autoname": "BT-.#####",
+ "creation": "2020-10-13 13:39:18.064279",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "supplier",
+  "date",
+  "table"
+ ],
+ "fields": [
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Supplier",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "allow_bulk_edit": 1,
+   "fieldname": "table",
+   "fieldtype": "Table",
+   "label": "Table",
+   "options": "Batch Freight Table"
+  }
+ ],
+ "modified": "2020-10-13 13:40:24.537134",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Batch Freight",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

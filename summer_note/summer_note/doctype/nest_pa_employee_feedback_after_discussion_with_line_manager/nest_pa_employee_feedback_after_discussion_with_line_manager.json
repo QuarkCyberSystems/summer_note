@@ -1,0 +1,29 @@
+{
+ "creation": "2023-02-12 19:42:37.315598",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "details"
+ ],
+ "fields": [
+  {
+   "fieldname": "details",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Details",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2023-04-01 12:42:38.751674",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Nest PA Employee Feedback After Discussion with Line Manager",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

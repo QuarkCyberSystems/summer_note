@@ -1,0 +1,70 @@
+{
+ "creation": "2023-04-18 03:33:31.993337",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "noticeable_event",
+  "date",
+  "event",
+  "event_type",
+  "financial_impact",
+  "bonus_additive"
+ ],
+ "fields": [
+  {
+   "fieldname": "noticeable_event",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Noticeable Event",
+   "options": "Employee Noticeable Event",
+   "read_only": 1
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "event",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Event",
+   "options": "Employee Event Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "event_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Event Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "financial_impact",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Financial Impact",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bonus_additive",
+   "fieldtype": "Float",
+   "label": "Bonus Additive",
+   "precision": "2",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2023-04-23 17:39:36.265463",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Bonus Noticeable Events",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

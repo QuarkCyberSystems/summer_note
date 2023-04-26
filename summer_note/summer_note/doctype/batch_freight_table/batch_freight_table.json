@@ -1,0 +1,76 @@
+{
+ "creation": "2020-10-13 13:37:46.398134",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "freight_invoice",
+  "invoice_date",
+  "airway_bill_no",
+  "freight_amount",
+  "customs_amount",
+  "doc_amount",
+  "misc_amount"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fieldname": "freight_invoice",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Freight Invoice"
+  },
+  {
+   "columns": 1,
+   "fieldname": "invoice_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Invoice Date"
+  },
+  {
+   "columns": 1,
+   "fieldname": "airway_bill_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Airway Bill No"
+  },
+  {
+   "columns": 1,
+   "fieldname": "freight_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Freight Amount"
+  },
+  {
+   "columns": 1,
+   "fieldname": "customs_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Customs Amount"
+  },
+  {
+   "columns": 1,
+   "fieldname": "doc_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Doc Amount"
+  },
+  {
+   "columns": 1,
+   "fieldname": "misc_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Misc Amount"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-10-13 13:44:24.857740",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Batch Freight Table",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

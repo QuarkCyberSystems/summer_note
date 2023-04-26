@@ -1,0 +1,494 @@
+{
+ "autoname": "format:PA{year}/{employee}",
+ "creation": "2023-02-12 19:20:38.070860",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "year",
+  "title",
+  "employee",
+  "employee_name",
+  "column_break_5",
+  "designation",
+  "date_of_joining",
+  "department",
+  "company",
+  "section_break_10",
+  "most_successful_achievements",
+  "section_break_12",
+  "performance_summary",
+  "section_break_14",
+  "line_manager_input",
+  "section_break_16",
+  "employee_feedback_after_discussion_with_line_manager",
+  "employee_areas_of_strength_section",
+  "attitude",
+  "initiative",
+  "dependability",
+  "work_quality",
+  "work_quantity",
+  "column_break_24",
+  "knowledge_of_job",
+  "team_play",
+  "organization_ability",
+  "judgement",
+  "responsibility",
+  "overall_rating_section",
+  "overall_rating",
+  "section_break_20",
+  "general_manager_feedback",
+  "hr_use_only_section",
+  "by_employee",
+  "increment_requested_by_employee",
+  "title_change_requested_by_employee",
+  "bonus_requested_by_employee",
+  "training_requested_by_employee",
+  "hr_recommendations",
+  "column_break_48",
+  "requested_by_manager",
+  "increment_requested_by_manager",
+  "title_change_requested_by_manager",
+  "bonus_requested_by_manager",
+  "training_requested_by_manager",
+  "column_break_53",
+  "request_details",
+  "increment_requested_details",
+  "title_change_requested_details",
+  "bonus_requested_details",
+  "training_requested_details",
+  "section_break_22",
+  "directors_feedback",
+  "appraisal_outcome_section",
+  "increment_decision",
+  "title_change__decision",
+  "bonus_decision",
+  "column_break_67",
+  "training_decision",
+  "disciplinary_decision",
+  "notes",
+  "submission_dates_section",
+  "employee_self_appraisal",
+  "line_manager",
+  "employee_feedback",
+  "column_break_40",
+  "general_manager",
+  "directors",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fetch_if_empty": 1,
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fetch_if_empty": 1,
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.date_of_joining",
+   "fetch_if_empty": 1,
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.department",
+   "fetch_if_empty": 1,
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.company",
+   "fetch_if_empty": 1,
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "most_successful_achievements",
+   "fieldtype": "Table",
+   "label": "MOST SUCCESSFUL ACHIEVEMENTS",
+   "options": "NEST PA Most Successful Achievements"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "performance_summary",
+   "fieldtype": "Table",
+   "label": "PERFORMANCE SUMMARY",
+   "options": "Nest PA Performance Summary"
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "line_manager_input",
+   "fieldtype": "Table",
+   "label": "LINE MANAGER INPUT",
+   "options": "Nest PA Line Manager Input"
+  },
+  {
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "employee_feedback_after_discussion_with_line_manager",
+   "fieldtype": "Table",
+   "label": "EMPLOYEE FEEDBACK AFTER DISCUSSION WITH LINE MANAGER",
+   "options": "Nest PA Employee Feedback After Discussion with Line Manager"
+  },
+  {
+   "fieldname": "employee_areas_of_strength_section",
+   "fieldtype": "Section Break",
+   "label": "EMPLOYEE AREAS OF STRENGTH"
+  },
+  {
+   "fieldname": "column_break_24",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "overall_rating_section",
+   "fieldtype": "Section Break",
+   "label": "OVERALL RATING"
+  },
+  {
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "general_manager_feedback",
+   "fieldtype": "Table",
+   "label": "GENERAL MANAGER FEEDBACK",
+   "options": "Nest PA General Manager Feedback"
+  },
+  {
+   "fieldname": "section_break_22",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "directors_feedback",
+   "fieldtype": "Table",
+   "label": "DIRECTORS FEEDBACK",
+   "options": "Nest PA Directors Feedback"
+  },
+  {
+   "fieldname": "submission_dates_section",
+   "fieldtype": "Section Break",
+   "label": "SUBMISSION DATES"
+  },
+  {
+   "fieldname": "employee_self_appraisal",
+   "fieldtype": "Date",
+   "label": "Employee Self Appraisal"
+  },
+  {
+   "fieldname": "line_manager",
+   "fieldtype": "Date",
+   "label": "Line Manager"
+  },
+  {
+   "fieldname": "employee_feedback",
+   "fieldtype": "Date",
+   "label": "Employee Feedback"
+  },
+  {
+   "fieldname": "column_break_40",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "general_manager",
+   "fieldtype": "Date",
+   "label": "General Manager"
+  },
+  {
+   "fieldname": "directors",
+   "fieldtype": "Date",
+   "label": "Directors"
+  },
+  {
+   "fieldname": "hr_use_only_section",
+   "fieldtype": "Section Break",
+   "label": "HR USE ONLY"
+  },
+  {
+   "fieldname": "by_employee",
+   "fieldtype": "Heading",
+   "label": "Requested By Employee"
+  },
+  {
+   "default": "0",
+   "fieldname": "increment_requested_by_employee",
+   "fieldtype": "Check",
+   "label": "Increment"
+  },
+  {
+   "default": "0",
+   "fieldname": "title_change_requested_by_employee",
+   "fieldtype": "Check",
+   "label": "Title Change"
+  },
+  {
+   "default": "0",
+   "fieldname": "bonus_requested_by_employee",
+   "fieldtype": "Check",
+   "label": "Bonus"
+  },
+  {
+   "default": "0",
+   "fieldname": "training_requested_by_employee",
+   "fieldtype": "Check",
+   "label": "Training"
+  },
+  {
+   "fieldname": "column_break_48",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "requested_by_manager",
+   "fieldtype": "Heading",
+   "label": "Requested By Manager"
+  },
+  {
+   "default": "0",
+   "fieldname": "increment_requested_by_manager",
+   "fieldtype": "Check",
+   "label": "Increment"
+  },
+  {
+   "default": "0",
+   "fieldname": "title_change_requested_by_manager",
+   "fieldtype": "Check",
+   "label": "Title Change"
+  },
+  {
+   "default": "0",
+   "fieldname": "bonus_requested_by_manager",
+   "fieldtype": "Check",
+   "label": "Bonus"
+  },
+  {
+   "default": "0",
+   "fieldname": "training_requested_by_manager",
+   "fieldtype": "Check",
+   "label": "Training"
+  },
+  {
+   "fieldname": "column_break_53",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "request_details",
+   "fieldtype": "Heading",
+   "label": "Request Details"
+  },
+  {
+   "fieldname": "increment_requested_details",
+   "fieldtype": "Data",
+   "label": "Increment"
+  },
+  {
+   "fieldname": "title_change_requested_details",
+   "fieldtype": "Data",
+   "label": "Title Change"
+  },
+  {
+   "fieldname": "bonus_requested_details",
+   "fieldtype": "Data",
+   "label": "Bonus"
+  },
+  {
+   "fieldname": "training_requested_details",
+   "fieldtype": "Data",
+   "label": "Training"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "NEST Performance Appraisal",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "attitude",
+   "fieldtype": "Rating",
+   "label": "attitude"
+  },
+  {
+   "fieldname": "initiative",
+   "fieldtype": "Rating",
+   "label": "initiative"
+  },
+  {
+   "fieldname": "dependability",
+   "fieldtype": "Rating",
+   "label": "dependability"
+  },
+  {
+   "fieldname": "work_quality",
+   "fieldtype": "Rating",
+   "label": "work_quality"
+  },
+  {
+   "fieldname": "work_quantity",
+   "fieldtype": "Rating",
+   "label": "work_quantity"
+  },
+  {
+   "fieldname": "knowledge_of_job",
+   "fieldtype": "Rating",
+   "label": "knowledge_of_job"
+  },
+  {
+   "fieldname": "team_play",
+   "fieldtype": "Rating",
+   "label": "team_play"
+  },
+  {
+   "fieldname": "organization_ability",
+   "fieldtype": "Rating",
+   "label": "organization_ability"
+  },
+  {
+   "fieldname": "judgement",
+   "fieldtype": "Rating",
+   "label": "judgement"
+  },
+  {
+   "fieldname": "responsibility",
+   "fieldtype": "Rating",
+   "label": "responsibility"
+  },
+  {
+   "fieldname": "overall_rating",
+   "fieldtype": "Rating",
+   "label": "overall_rating"
+  },
+  {
+   "fieldname": "hr_recommendations",
+   "fieldtype": "Small Text",
+   "label": "HR Recommendations",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "appraisal_outcome_section",
+   "fieldtype": "Section Break",
+   "label": "APPRAISAL OUTCOME",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "increment_decision",
+   "fieldtype": "Data",
+   "label": "Increment Decision",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "title_change__decision",
+   "fieldtype": "Data",
+   "label": "Title Change  Decision",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "bonus_decision",
+   "fieldtype": "Data",
+   "label": "Bonus Decision",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "column_break_67",
+   "fieldtype": "Column Break",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "training_decision",
+   "fieldtype": "Data",
+   "label": "Training Decision",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "disciplinary_decision",
+   "fieldtype": "Data",
+   "label": "Disciplinary Decision",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Data",
+   "label": "Notes",
+   "permlevel": 2
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2023-03-08 08:33:46.233697",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "NEST Performance Appraisal",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "year, employee",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "title",
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
+}

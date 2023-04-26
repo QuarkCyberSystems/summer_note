@@ -1,0 +1,569 @@
+{
+ "autoname": "format:{employee_name}-{fiscal_year}",
+ "creation": "2023-04-17 21:15:02.476600",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_info_section",
+  "employee",
+  "employee_name",
+  "department",
+  "company",
+  "column_break_6",
+  "date_of_joining",
+  "salary",
+  "fiscal_year",
+  "valuation_date",
+  "months_ytd",
+  "net_profit",
+  "target_vs_actual_section",
+  "bonus_target_vs_actual",
+  "section_break_12",
+  "total_target",
+  "column_break_14",
+  "total_actual",
+  "overdue_receivables_section",
+  "bonus_overdue_receivables",
+  "section_break_17",
+  "column_break_20",
+  "column_break_21",
+  "overdue_receivables_total_deductions",
+  "stock_aging_section",
+  "bonus_stock_aging",
+  "section_break_20",
+  "column_break_26",
+  "column_break_27",
+  "stock_aging_total_deductions",
+  "realized_opportunities_section",
+  "bonus_realized_opportunity",
+  "section_break_23",
+  "column_break_32",
+  "column_break_33",
+  "realized_opportunities_bonus_additive",
+  "gross_margin_section",
+  "bonus_gross_margin",
+  "section_break_26",
+  "average_gross_margin",
+  "column_break_38",
+  "column_break_39",
+  "gross_margin_bonus_additive",
+  "gross_profit_section",
+  "bonus_gross_profit",
+  "section_break_29",
+  "column_break_42",
+  "column_break_45",
+  "gross_profit_bonus_additive",
+  "sales_visits_section",
+  "number_of_sales_visits",
+  "column_break_49",
+  "sales_visits_bonus_additive",
+  "attendance_and_punctuality_section",
+  "ytd_late_minutes",
+  "column_break_43",
+  "attendance_bonus_additive",
+  "performace_appraisal_section",
+  "average_performance_appraisal",
+  "column_break_40",
+  "employee_noticeable_events_section",
+  "bonus_noticeable_events",
+  "section_break_43",
+  "column_break_58",
+  "column_break_59",
+  "noticeable_events_bonus_additive",
+  "summary_section",
+  "base_bonus",
+  "adjusted_actual_sales",
+  "column_break_48",
+  "service_period_factor",
+  "actual_vs_target_bonus_factor",
+  "performance_appraisal_factor",
+  "total_bonus_additives",
+  "total_accrued_bonus"
+ ],
+ "fields": [
+  {
+   "fieldname": "basic_info_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Info",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fetch_if_empty": 1,
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.department",
+   "fetch_if_empty": 1,
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.company",
+   "fetch_if_empty": 1,
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.date_of_joining",
+   "fetch_if_empty": 1,
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "valuation_date",
+   "fieldtype": "Date",
+   "label": "Valuation Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "months_ytd",
+   "fieldtype": "Int",
+   "label": "Months YTD",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "salary",
+   "fieldtype": "Float",
+   "label": "Salary",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "target_vs_actual_section",
+   "fieldtype": "Section Break",
+   "label": "Sales Target vs Actual",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_target",
+   "fieldtype": "Float",
+   "label": "Total Sales Target",
+   "precision": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_actual",
+   "fieldtype": "Float",
+   "label": "Total Actual Sales",
+   "precision": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "overdue_receivables_section",
+   "fieldtype": "Section Break",
+   "label": "Overdue Receivables",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_17",
+   "fieldtype": "Section Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "overdue_receivables_total_deductions",
+   "fieldtype": "Float",
+   "label": "Overdue Receivables Total Deductions (Actual Sales Adjustment)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_aging_section",
+   "fieldtype": "Section Break",
+   "label": "Stock Aging",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_aging_total_deductions",
+   "fieldtype": "Float",
+   "label": "Stock Aging Total Deductions (Actual Sales Adjustment)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "realized_opportunities_section",
+   "fieldtype": "Section Break",
+   "label": "Realized Opportunities",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_23",
+   "fieldtype": "Section Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "realized_opportunities_bonus_additive",
+   "fieldtype": "Float",
+   "label": "Realized Opportunities (Bonus Additive)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gross_margin_section",
+   "fieldtype": "Section Break",
+   "label": "Gross Margin",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_26",
+   "fieldtype": "Section Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gross_margin_bonus_additive",
+   "fieldtype": "Float",
+   "label": "Gross Margin (Bonus Additive)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gross_profit_section",
+   "fieldtype": "Section Break",
+   "label": "Revenue",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_29",
+   "fieldtype": "Section Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gross_profit_bonus_additive",
+   "fieldtype": "Float",
+   "label": "Gross Revenue (Bonus Additive)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sales_visits_section",
+   "fieldtype": "Section Break",
+   "label": "Sales Visits",
+   "read_only": 1
+  },
+  {
+   "fieldname": "number_of_sales_visits",
+   "fieldtype": "Int",
+   "label": "Number of Sales Visits",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_33",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sales_visits_bonus_additive",
+   "fieldtype": "Float",
+   "label": "Sales Visits (Bonus Additive)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attendance_and_punctuality_section",
+   "fieldtype": "Section Break",
+   "label": "Attendance and Punctuality",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attendance_bonus_additive",
+   "fieldtype": "Float",
+   "label": "Attendance (Bonus Additive)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "performace_appraisal_section",
+   "fieldtype": "Section Break",
+   "label": "Performace Appraisal",
+   "read_only": 1
+  },
+  {
+   "fieldname": "average_performance_appraisal",
+   "fieldtype": "Float",
+   "label": "Average Performance Appraisal",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_40",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee_noticeable_events_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Noticeable Events",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_43",
+   "fieldtype": "Section Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "summary_section",
+   "fieldtype": "Section Break",
+   "label": "SUMMARY",
+   "read_only": 1
+  },
+  {
+   "fieldname": "base_bonus",
+   "fieldtype": "Float",
+   "label": "Base Bonus",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "adjusted_actual_sales",
+   "fieldtype": "Float",
+   "label": "Adjusted Actual Sales",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "service_period_factor",
+   "fieldtype": "Percent",
+   "label": "Service Period (Factor %)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "actual_vs_target_bonus_factor",
+   "fieldtype": "Percent",
+   "label": "Actual vs Target (Factor %)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "performance_appraisal_factor",
+   "fieldtype": "Percent",
+   "label": "Performance Appraisal (Factor %)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_bonus_additives",
+   "fieldtype": "Float",
+   "label": "Total Bonus Additives",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "total_accrued_bonus",
+   "fieldtype": "Float",
+   "label": "TOTAL ACCRUED BONUS",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_48",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bonus_target_vs_actual",
+   "fieldtype": "Table",
+   "options": "Bonus Target vs Actual",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bonus_gross_margin",
+   "fieldtype": "Table",
+   "options": "Bonus Gross Margin",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bonus_realized_opportunity",
+   "fieldtype": "Table",
+   "options": "Bonus Realized Opportunity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bonus_stock_aging",
+   "fieldtype": "Table",
+   "options": "Bonus Stock Aging",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bonus_overdue_receivables",
+   "fieldtype": "Table",
+   "options": "Bonus Overdue Receivables",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bonus_gross_profit",
+   "fieldtype": "Table",
+   "options": "Bonus Gross Profit",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_43",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bonus_noticeable_events",
+   "fieldtype": "Table",
+   "label": "Bonus Noticeable Events",
+   "options": "Bonus Noticeable Events",
+   "read_only": 1
+  },
+  {
+   "fieldname": "noticeable_events_bonus_additive",
+   "fieldtype": "Float",
+   "label": "Noticeable Events (Bonus Additive)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_26",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_27",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_32",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_42",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_58",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_59",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_38",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_39",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_45",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_49",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "Fiscal Year",
+   "options": "Fiscal Year",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ytd_late_minutes",
+   "fieldtype": "Int",
+   "label": "YTD Late Minutes",
+   "read_only": 1
+  },
+  {
+   "fieldname": "net_profit",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Net Profit",
+   "read_only": 1
+  },
+  {
+   "fieldname": "average_gross_margin",
+   "fieldtype": "Percent",
+   "label": "Average Gross Margin",
+   "read_only": 1
+  }
+ ],
+ "modified": "2023-04-24 19:31:41.449802",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Bonus Accrual",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

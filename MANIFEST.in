@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include summer_note *.css
+recursive-include summer_note *.csv
+recursive-include summer_note *.html
+recursive-include summer_note *.ico
+recursive-include summer_note *.js
+recursive-include summer_note *.json
+recursive-include summer_note *.md
+recursive-include summer_note *.png
+recursive-include summer_note *.py
+recursive-include summer_note *.svg
+recursive-include summer_note *.txt
+recursive-exclude summer_note *.pyc

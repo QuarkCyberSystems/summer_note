@@ -1,0 +1,289 @@
+{
+ "creation": "2023-04-05 20:54:08.795925",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "profit_target_base_bonus_and_minimum_service_period_section",
+  "bonus_basis",
+  "minimum_service_period_days",
+  "target_profit_margin",
+  "maximum_base_bonus_percentage",
+  "column_break_5",
+  "nest_annual_profit_target",
+  "nest_es_profit_target",
+  "firmo_annual_profit_target",
+  "receivables_and_stock_aging_adjustments_section",
+  "overdue_receivable_minimum_margin_percentage",
+  "overdue_receivable_90_days_deduction_rate",
+  "overdue_receivable_180_days_deduction_rate",
+  "overdue_receivable_270_days_deduction_rate",
+  "overdue_receivable_365_days_deduction_rate",
+  "column_break_15",
+  "stock_aging_minimum_margin_percentage",
+  "stock_aging_90_days_deduction_rate",
+  "stock_aging_180_days_deduction_rate",
+  "stock_aging_365_days_deduction_rate",
+  "stock_aging_730_days_deduction_rate",
+  "sales_target_vs_actual_achieved_factor_section",
+  "exceeding_target_incentive_percentage",
+  "minimum_acceptable_achieved_percentage",
+  "column_break_18",
+  "exceeding_target_maximum_percentage",
+  "performance_appraisal_factor_section",
+  "peformance_appraisal_factor_rate",
+  "realized_opportunities_gross_margin_and_profit_section",
+  "major_opportunities_incentive_percentage",
+  "gross_margin_percentage",
+  "reduced_margin_penalty_multiplier",
+  "column_break_31",
+  "estimated_revenue_from_sales",
+  "net_profit_impact_factor",
+  "attendance_sales_visits_and_noticeable_events_section",
+  "latest_attendance_minutes",
+  "earliest_attendance_minutes",
+  "attendance_delay_penalty_factor",
+  "column_break_39",
+  "customer_visits_incentive",
+  "employee_noticeable_event_incident_rate",
+  "employee_noticeable_event_incident_financial_impact_rate"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer_visits_incentive",
+   "fieldtype": "Currency",
+   "label": "Customer Visits Incentive"
+  },
+  {
+   "fieldname": "major_opportunities_incentive_percentage",
+   "fieldtype": "Percent",
+   "label": "Major Opportunities Incentive Percentage"
+  },
+  {
+   "fieldname": "gross_margin_percentage",
+   "fieldtype": "Percent",
+   "label": "Gross Margin Percentage"
+  },
+  {
+   "description": "-2/(60*8*5*52/12)",
+   "fieldname": "attendance_delay_penalty_factor",
+   "fieldtype": "Float",
+   "label": "Attendance Delay Penalty Factor",
+   "precision": "9"
+  },
+  {
+   "fieldname": "net_profit_impact_factor",
+   "fieldtype": "Percent",
+   "label": "Gross Revenue Impact Factor"
+  },
+  {
+   "fieldname": "employee_noticeable_event_incident_rate",
+   "fieldtype": "Currency",
+   "label": "Employee Noticeable Event Incident Rate"
+  },
+  {
+   "fieldname": "employee_noticeable_event_incident_financial_impact_rate",
+   "fieldtype": "Percent",
+   "label": "Employee Noticeable Event Incident Financial Impact Percentage"
+  },
+  {
+   "fieldname": "peformance_appraisal_factor_rate",
+   "fieldtype": "Percent",
+   "label": "Peformance Appraisal Factor Rate"
+  },
+  {
+   "fieldname": "overdue_receivable_minimum_margin_percentage",
+   "fieldtype": "Percent",
+   "label": "Overdue Receivable Minimum Margin Percentage"
+  },
+  {
+   "fieldname": "overdue_receivable_90_days_deduction_rate",
+   "fieldtype": "Percent",
+   "label": "Overdue Receivable 90 Days Deduction Rate"
+  },
+  {
+   "fieldname": "overdue_receivable_180_days_deduction_rate",
+   "fieldtype": "Percent",
+   "label": "Overdue Receivable 180 Days Deduction Rate"
+  },
+  {
+   "fieldname": "overdue_receivable_270_days_deduction_rate",
+   "fieldtype": "Percent",
+   "label": "Overdue Receivable 270 Days Deduction Rate"
+  },
+  {
+   "fieldname": "overdue_receivable_365_days_deduction_rate",
+   "fieldtype": "Percent",
+   "label": "Overdue Receivable 365 Days Deduction Rate"
+  },
+  {
+   "fieldname": "maximum_base_bonus_percentage",
+   "fieldtype": "Percent",
+   "label": "Maximum Base Bonus Percentage"
+  },
+  {
+   "fieldname": "exceeding_target_incentive_percentage",
+   "fieldtype": "Percent",
+   "label": "Exceeding Target Incentive Percentage"
+  },
+  {
+   "fieldname": "exceeding_target_maximum_percentage",
+   "fieldtype": "Percent",
+   "label": "Exceeding Target Maximum Percentage"
+  },
+  {
+   "fieldname": "nest_annual_profit_target",
+   "fieldtype": "Float",
+   "label": "NEST Annual Profit Target"
+  },
+  {
+   "fieldname": "nest_es_profit_target",
+   "fieldtype": "Float",
+   "label": "NEST ES Profit Target"
+  },
+  {
+   "fieldname": "firmo_annual_profit_target",
+   "fieldtype": "Float",
+   "label": "FIRMO Annual Profit Target"
+  },
+  {
+   "fieldname": "target_profit_margin",
+   "fieldtype": "Percent",
+   "label": "Target Profit Margin"
+  },
+  {
+   "fieldname": "profit_target_base_bonus_and_minimum_service_period_section",
+   "fieldtype": "Section Break",
+   "label": "Profit Target, Base Bonus, and Minimum Service Period"
+  },
+  {
+   "fieldname": "sales_target_vs_actual_achieved_factor_section",
+   "fieldtype": "Section Break",
+   "label": "Sales Target vs Actual Achieved Factor"
+  },
+  {
+   "fieldname": "receivables_and_stock_aging_adjustments_section",
+   "fieldtype": "Section Break",
+   "label": "Receivables and Stock Aging Adjustments"
+  },
+  {
+   "fieldname": "performance_appraisal_factor_section",
+   "fieldtype": "Section Break",
+   "label": "Performance Appraisal Factor"
+  },
+  {
+   "fieldname": "realized_opportunities_gross_margin_and_profit_section",
+   "fieldtype": "Section Break",
+   "label": "Realized Opportunities, Gross Margin and Profit"
+  },
+  {
+   "fieldname": "attendance_sales_visits_and_noticeable_events_section",
+   "fieldtype": "Section Break",
+   "label": "Attendance, Sales Visits, and Noticeable Events"
+  },
+  {
+   "fieldname": "minimum_acceptable_achieved_percentage",
+   "fieldtype": "Percent",
+   "label": "Minimum Acceptable Achieved Percentage"
+  },
+  {
+   "fieldname": "minimum_service_period_days",
+   "fieldtype": "Data",
+   "label": "Minimum Service Period (Days)"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stock_aging_minimum_margin_percentage",
+   "fieldtype": "Percent",
+   "label": "Stock Aging Minimum Margin Percentage"
+  },
+  {
+   "fieldname": "stock_aging_90_days_deduction_rate",
+   "fieldtype": "Percent",
+   "label": "Stock Aging 90 Days Deduction Rate"
+  },
+  {
+   "fieldname": "stock_aging_180_days_deduction_rate",
+   "fieldtype": "Percent",
+   "label": "Stock Aging 180 Days Deduction Rate"
+  },
+  {
+   "fieldname": "stock_aging_365_days_deduction_rate",
+   "fieldtype": "Percent",
+   "label": "Stock Aging 365 Days Deduction Rate"
+  },
+  {
+   "fieldname": "stock_aging_730_days_deduction_rate",
+   "fieldtype": "Percent",
+   "label": "Stock Aging 730 Days Deduction Rate"
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_31",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reduced_margin_penalty_multiplier",
+   "fieldtype": "Data",
+   "label": "Reduced Margin Penalty Multiplier"
+  },
+  {
+   "fieldname": "estimated_revenue_from_sales",
+   "fieldtype": "Percent",
+   "label": "Estimated Revenue from Sales"
+  },
+  {
+   "fieldname": "latest_attendance_minutes",
+   "fieldtype": "Int",
+   "label": "Latest Attendance Minutes"
+  },
+  {
+   "fieldname": "earliest_attendance_minutes",
+   "fieldtype": "Int",
+   "label": "Earliest Attendance Minutes"
+  },
+  {
+   "fieldname": "column_break_39",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bonus_basis",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Bonus Basis",
+   "options": "Full Salary\nBasic Salary",
+   "reqd": 1
+  }
+ ],
+ "issingle": 1,
+ "modified": "2023-04-24 08:40:16.438490",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Bonus Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -1,0 +1,41 @@
+{
+ "allow_import": 1,
+ "autoname": "format:ST{fiscal_year}",
+ "creation": "2023-03-28 21:28:59.620142",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "fiscal_year"
+ ],
+ "fields": [
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "Fiscal Year",
+   "options": "Fiscal Year"
+  }
+ ],
+ "modified": "2023-04-12 05:50:40.059778",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Brand wise Sales Targets",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

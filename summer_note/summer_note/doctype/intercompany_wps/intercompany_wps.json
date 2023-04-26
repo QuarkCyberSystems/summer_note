@@ -1,0 +1,57 @@
+{
+ "allow_copy": 1,
+ "creation": "2021-03-14 16:00:46.102387",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "from_date",
+  "to_date",
+  "inter_company_accounts",
+  "create_jv"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  },
+  {
+   "fieldname": "create_jv",
+   "fieldtype": "Button",
+   "label": "Create"
+  },
+  {
+   "fieldname": "inter_company_accounts",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Inter Company Accounts",
+   "options": "Inter Company Accounts"
+  }
+ ],
+ "hide_toolbar": 1,
+ "issingle": 1,
+ "modified": "2021-03-15 14:55:47.752753",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Intercompany Wps",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Accounts Manager",
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

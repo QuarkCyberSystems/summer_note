@@ -1,0 +1,84 @@
+{
+ "creation": "2023-03-28 21:37:04.870896",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "brand",
+  "type",
+  "region",
+  "q1",
+  "q2",
+  "q3",
+  "q4",
+  "total"
+ ],
+ "fields": [
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Brand",
+   "options": "Brand",
+   "reqd": 1
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Type",
+   "options": "Project Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "q1",
+   "fieldtype": "Currency",
+   "label": "Q1",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "q2",
+   "fieldtype": "Currency",
+   "label": "Q2",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "q3",
+   "fieldtype": "Currency",
+   "label": "Q3",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "q4",
+   "fieldtype": "Currency",
+   "label": "Q4",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Currency",
+   "label": "Total",
+   "options": "Company:company:default_currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Region",
+   "options": "Sales Region",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2023-03-29 00:30:02.979133",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Brand wise Child Table",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

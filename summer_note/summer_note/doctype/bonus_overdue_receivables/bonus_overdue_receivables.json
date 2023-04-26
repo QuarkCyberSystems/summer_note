@@ -1,0 +1,113 @@
+{
+ "creation": "2023-04-18 03:05:18.320759",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "brand",
+  "over_90_days_amount",
+  "over_180_days_amount",
+  "over_270_days_amount",
+  "over_365_days_amount",
+  "over_90_days_impact",
+  "over_180_days_impact",
+  "over_270_days_impact",
+  "over_365_days_impact",
+  "brand_allocation",
+  "sales_additive"
+ ],
+ "fields": [
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Brand",
+   "options": "Brand",
+   "read_only": 1
+  },
+  {
+   "fieldname": "over_90_days_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Over 90 Days Amount",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "over_180_days_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Over 180 Days Amount",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "over_270_days_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Over 270 Days Amount",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "over_365_days_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Over 365 Days Amount",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "over_90_days_impact",
+   "fieldtype": "Float",
+   "label": "Over 90 Days Impact",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "over_180_days_impact",
+   "fieldtype": "Float",
+   "label": "Over 180 Days Impact",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "over_270_days_impact",
+   "fieldtype": "Float",
+   "label": "Over 270 Days Impact",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "over_365_days_impact",
+   "fieldtype": "Float",
+   "label": "Over 365 Days Impact",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "brand_allocation",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Brand Allocation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sales_additive",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Sales Additive",
+   "precision": "2",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2023-04-25 09:06:45.074516",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Bonus Overdue Receivables",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

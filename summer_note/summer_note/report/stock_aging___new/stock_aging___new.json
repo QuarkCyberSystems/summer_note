@@ -1,0 +1,66 @@
+{
+ "add_total_row": 1,
+ "creation": "2023-04-08 23:48:42.191642",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2023-04-08 23:48:42.191642",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Stock Aging - New",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Stock Ledger Entry",
+ "report_name": "Stock Aging - New",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Material User"
+  },
+  {
+   "role": "Procurement Head"
+  },
+  {
+   "role": "Procurement Officer"
+  },
+  {
+   "role": "Store Keeper"
+  },
+  {
+   "role": "Internal Sales Head"
+  },
+  {
+   "role": "Internal Sales Officer"
+  },
+  {
+   "role": "Finance Head"
+  },
+  {
+   "role": "Finance Officer"
+  },
+  {
+   "role": "General Manager"
+  },
+  {
+   "role": "Director"
+  },
+  {
+   "role": "Sales Mgr"
+  },
+  {
+   "role": "Workshop Supervisor"
+  },
+  {
+   "role": "Jnr Store Keeper"
+  },
+  {
+   "role": "Sales User"
+  }
+ ]
+}

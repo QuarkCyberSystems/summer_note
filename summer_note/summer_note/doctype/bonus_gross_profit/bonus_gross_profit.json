@@ -1,0 +1,103 @@
+{
+ "creation": "2023-04-18 03:12:04.719211",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "brand",
+  "type",
+  "region",
+  "sales_target",
+  "estimated_revenue",
+  "actual_revenue",
+  "brand_allocation",
+  "additive_rate",
+  "bonus_additive"
+ ],
+ "fields": [
+  {
+   "columns": 2,
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Brand",
+   "options": "Brand",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "sales_target",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Sales Target",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "estimated_revenue",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Estimated Revenue",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "actual_revenue",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Actual Revenue",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "brand_allocation",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": " Brand Allocation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "additive_rate",
+   "fieldtype": "Percent",
+   "label": "Additive Rate",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bonus_additive",
+   "fieldtype": "Float",
+   "label": "Bonus Additive",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Type",
+   "options": "Project Type",
+   "read_only": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "region",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Region",
+   "options": "Sales Region",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2023-04-25 09:05:51.158988",
+ "modified_by": "Administrator",
+ "module": "Summer Note",
+ "name": "Bonus Gross Profit",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
