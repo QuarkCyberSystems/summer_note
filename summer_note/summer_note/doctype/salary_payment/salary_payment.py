@@ -7,6 +7,44 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 
+# *******************************************************************************************
+# **********  2023-07-21 GET EMPLOYEES COST CENTER FROM SSA ELSE DEPT ***********************
+# *******************************************************************************************
+def get_employee_cost_centers(employee=None):
+	cost_centers = {}
+	ss_assignment_name = frappe.db.get_value(
+		"Salary Structure Assignment",
+		{"employee": employee, "docstatus": 1},
+		"name",
+	)
+	if ss_assignment_name:
+		cost_centers = dict(
+			frappe.get_all(
+				"Employee Cost Center",
+				{"parent": ss_assignment_name},
+				["cost_center", "percentage"],
+				as_list=1,
+			)
+		)
+		if not cost_centers:
+			default_cost_center, department = frappe.get_cached_value(
+				"Employee", employee, ["payroll_cost_center", "department"]
+			)
+			if not default_cost_center and department:
+				default_cost_center = frappe.get_cached_value(
+					"Department", department, "payroll_cost_center"
+				)
+			if not default_cost_center:
+				default_cost_center = frappe.get_value("Department", frappe.get_value("Employee", employee, "department"), "cost_center")
+
+			cost_centers = {default_cost_center: 100}	
+
+	return cost_centers
+# *******************************************************************************************
+# *******************************************************************************************
+# *******************************************************************************************
+
+
 class SalaryPayment(Document):
     # 1/4
     # This method runs on a New Salary Payment Entry ONLY to populate the Salary Slips into the Child table of the Salary Payment Document.
@@ -45,7 +83,7 @@ class SalaryPayment(Document):
                     #"salary_payment": ("=", ""), 
                     "salary_payment":'',
                     "sponsoring_company": self.company
-                    }, fields=["name", "net_pay", "employee","employee_name", "payroll_entry"])
+                    }, fields=["name", "net_pay", "employee","employee_name", "department", "payroll_entry"])
                 ##frappe.errprint(ss)
                 if ss:
                     for item in ss:
@@ -90,6 +128,18 @@ class SalaryPayment(Document):
         fir_jv.naming_series = "FIRMO-JV/HR/.YY./.####"
         fir_jv.salary_payment = self.name  
 
+        jv = frappe.new_doc("Journal Entry")
+        jv.company = self.company
+        jv.posting_date = self.real_posting_date
+        jv.title = "Salary Payment: " + self.name + " Bank Payment"
+        if self.company == "National Engineering Services & Trading Co LLC":
+            jv.naming_series = "JV/HR/.YY./.####"
+        if self.company == "NEST Employment Services LLC":
+            jv.naming_series = "NEE-JV/HR/.YY./.####"
+        if self.company == "Firmo Technical Petroleum Services LLC":
+            jv.naming_series = "FIRMO-JV/HR/.YY./.####"
+        jv.salary_payment = self.name 
+
         curr_total = 0
 
         for item in self.get("unpaid_salaries"):
@@ -101,6 +151,18 @@ class SalaryPayment(Document):
                     # ******************************** SAME COMPANY ******************************************
                     #frappe.errprint("SAME COMPANY for: " + item.salary_slip)
                     curr_total += item.net_pay
+                    for cost_center, cc_percentage in get_employee_cost_centers(item.employee).items():              
+                        jv.append("accounts",{
+                                    "account": frappe.get_value("Company", jv.company, "default_payroll_payable_account"),
+                                    "debit_in_account_currency": item.net_pay*cc_percentage/100,
+                                    "cost_center": cost_center, #frappe.get_value("Company", self.company, "cost_center"),
+                                    "party_type":"Employee",
+                                    "party":item.employee,
+                                    "divisions": frappe.get_value("Department", frappe.get_value("Employee", item.employee, "department"), "division"),
+                                    "department":frappe.get_value("Employee", item.employee, "department"),
+                                    "employee":item.employee,
+                                    "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
+                                    })
                     frappe.db.set_value("Salary Slip", item.salary_slip,"salary_payment", self.name)
 
                 #if frappe.get_value("Employee", item.employee, "company") != frappe.get_value("Employee", item.employee, "sponsoring_company"): ************************
@@ -124,29 +186,6 @@ class SalaryPayment(Document):
                         if led.company == frappe.get_value("Employee", item.employee, "sponsoring_company"):
                             working_rec_ledger = led.receivable_account
                             #frappe.errprint('working_rec - ' + working_rec_ledger)
-
-                    #frappe.errprint('Inter-Company Transaction Company: ' + working_comp.name)
-
-#                    #1 RECEIVABLE Transaction in the Sponsoring Company.
-#                    if working_comp.name == "National Engineering Services & Trading Co LLC":        
-#                        #frappe.errprint("working_comp")    
-#                        nest_jv.append("accounts",{
-#                                    "account": rec_ledger,
-#                                    "credit_in_account_currency": item.net_pay,
-#                                    "cost_center": frappe.get_value("Company", spon_comp.name, "cost_center"),
-#                                    "party_type":"Employee",
-#                                    "party":item.employee,
-#                                    "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
-#                                    })
-#                        nest_jv.append("accounts",{
-#                                    "account": frappe.get_value("Company", spon_comp.name, "default_payroll_payable_account") ,
-#                                    "cost_center": frappe.get_value("Company", spon_comp.name, "cost_center"),
-#                                    "debit_in_account_currency": item.net_pay,
-#                                    "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
-#                                    })
-#                        nest_jv.salary_payment = self.name
-#                        nest_jv.save()
-
 
                     #2 Sponsoring Company PAYMENT Transaction.
                     if self.company == "National Engineering Services & Trading Co LLC":        
@@ -176,28 +215,6 @@ class SalaryPayment(Document):
                         nest_jv.salary_payment = self.name
                         nest_jv.save()
                         frappe.db.set_value("Salary Slip", item.salary_slip,"salary_payment", self.name)
-                        
-#                    #3 Working Company RECEIVABLE Transaction.
-#                    if working_comp.name == "NEST Employment Services LLC":        
-#                        #frappe.errprint("working_comp")    
-#                        nees_jv.append("accounts",{
-#                                    "account": working_rec_ledger,
-#                                    "cost_center": frappe.get_value("Company", spon_comp.name, "cost_center"),
-#                                    "credit_in_account_currency": item.net_pay,
-#                                    "party_type":"Employee",
-#                                    "party":item.employee,
-#                                    "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
-#                                    })
-#                        nees_jv.append("accounts",{
-#                                    "account": frappe.get_value("Company", spon_comp.name, "default_payroll_payable_account") ,
-#                                    "cost_center": frappe.get_value("Company", spon_comp.name, "cost_center"),
-#                                    "debit_in_account_currency": item.net_pay,
-#                                    "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
-#                                    })
-#                        nees_jv.salary_payment = self.name
-#                        nees_jv.save()
-
-
                     #4 Sponsoring Company PAYMENT Transaction.
                     if self.company == "NEST Employment Services LLC":        
                         #frappe.errprint('Payment of ' + self.company + ' ' + item.salary_slip + ' in NEST Employment')                           
@@ -226,32 +243,9 @@ class SalaryPayment(Document):
                         nees_jv.salary_payment = self.name
                         nees_jv.save()
                         frappe.db.set_value("Salary Slip", item.salary_slip,"salary_payment", self.name)
-
-
-#                    #5 Working Company RECEIVABLE Transaction.
-#                    if working_comp.name == "Firmo Technical Petroleum Services LLC":        
-#                        #frappe.errprint("working_comp")    
-#                        fir_jv.append("accounts",{
-#                                    "account": working_rec_ledger,
-#                                    "cost_center": frappe.get_value("Company", spon_comp.name, "cost_center"),
-#                                    "credit_in_account_currency": item.net_pay,
-#                                    "party_type":"Employee",
-#                                    "party":item.employee,
-#                                    "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
-#                                    })
-#                        fir_jv.append("accounts",{
-#                                    "account": frappe.get_value("Company", spon_comp.name, "default_payroll_payable_account"),
-#                                    "cost_center": frappe.get_value("Company", spon_comp.name, "cost_center"),
-#                                    "debit_in_account_currency": item.net_pay,
-#                                    "user_remark":item.salary_slip  # *******************************************  ADDED LINE  ************************************
-#                                    })
-#                        fir_jv.salary_payment = self.name
-#                        fir_jv.save()
-
-
                     #6 Sponsoring Company PAYMENT Transaction.
                     if self.company == "Firmo Technical Petroleum Services LLC":        
-                        #frappe.errprint('Payment of ' + self.company + ' ' + item.salary_slip + ' in FIRMO')                                                       
+                        #frappe.errprint('Payment of ' + self.company + ' ' + item.salary_slip + ' in FIRMO')    
                         fir_jv.append("accounts",{
                                     "account": rec_ledger,
                                     "cost_center": frappe.get_value("Company", self.company, "cost_center"),
@@ -278,11 +272,6 @@ class SalaryPayment(Document):
                         fir_jv.save()
                         frappe.db.set_value("Salary Slip", item.salary_slip,"salary_payment", self.name)
 
-                # ***********************************   NOT REQUIRED. DONE IN 3/12 add_expense_claim()   ***************************************************************
-                #for item in frappe.get_all('Expense Claim', filters={'status': 'Unpaid', 'employee': item.employee,
-                #'docstatus':1, 'added_to_salary_slip':1}, fields=['name']):
-                #    frappe.db.set_value("Salary Slip", item.name,"status", "Paid")
-        
         if nest_jv.get("accounts"):
             nest_jv.submit()
         if nees_jv.get("accounts"):
@@ -294,23 +283,6 @@ class SalaryPayment(Document):
         # ***************************************************** SAME COMPANY ENTRY ***********************************************
         if curr_total > 0:
             #frappe.errprint('SAME COMPANY ENTRY ' + str(frappe.get_value("Company", self.company, "default_payroll_payable_account")))
-            jv = frappe.new_doc("Journal Entry")
-            jv.company = self.company
-            jv.posting_date = self.real_posting_date
-            jv.title = "Salary Payment: " + self.name + " Bank Payment"
-            if self.company == "National Engineering Services & Trading Co LLC":
-                jv.naming_series = "JV/HR/.YY./.####"
-            if self.company == "NEST Employment Services LLC":
-                jv.naming_series = "NEE-JV/HR/.YY./.####"
-            if self.company == "Firmo Technical Petroleum Services LLC":
-                jv.naming_series = "FIRMO-JV/HR/.YY./.####"
-            #jv.naming_series = "JV/HR/.YY./.####" # ******************************* WRONG !!!!!!!!! ******************************
-            jv.salary_payment = self.name 
-            jv.append("accounts",{
-                        "account": frappe.get_value("Company", jv.company, "default_payroll_payable_account"),
-                        "debit_in_account_currency": curr_total,
-                        "cost_center": frappe.get_value("Company", self.company, "cost_center"),
-                        })
             jv.append("accounts",{
                         "account": self.bank_cash_account,
                         "credit_in_account_currency": curr_total,

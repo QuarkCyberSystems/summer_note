@@ -32,18 +32,18 @@ frappe.query_reports["Stock Aging - New"] = {
 		//console.log ('********* REPORT ONLOAD **********');
 		show_progress();
 		frappe.call({
-			method:"summer_note.common.create_stock_aging",
+			method:"nest_qcs.common.create_stock_aging",
 			callback: function(r) 
 			{
 				if(r.message === 0) 
 				{
 					//console.log ('********* ONLOAD  CREATE TABLE FINISHED **********');
 					frappe.show_progress('Loading..', 100, 100, 'Please wait');
-					frappe.msgprint({
-						title: __('Report Generated Successfully'),
-						indicator: 'green',
-						message: __('Please select the report filters.')
-					});
+					// frappe.msgprint({
+					// 	title: __('Report Generated Successfully'),
+					// 	indicator: 'green',
+					// 	message: __('Please select the report filters.')
+					// });
 
 				}
 			}

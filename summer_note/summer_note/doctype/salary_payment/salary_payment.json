@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "autoname": "SP-.####",
  "creation": "2021-03-28 17:14:54.442253",
  "doctype": "DocType",
@@ -80,10 +81,12 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2021-10-22 23:16:19.703855",
+ "links": [],
+ "modified": "2024-02-20 07:30:36.661799",
  "modified_by": "Administrator",
  "module": "Summer Note",
  "name": "Salary Payment",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
@@ -142,5 +145,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

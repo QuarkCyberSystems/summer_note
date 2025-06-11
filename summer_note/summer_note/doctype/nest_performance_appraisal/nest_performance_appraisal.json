@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "autoname": "format:PA{year}/{employee}",
  "creation": "2023-02-12 19:20:38.070860",
  "doctype": "DocType",
@@ -20,22 +21,22 @@
   "performance_summary",
   "section_break_14",
   "line_manager_input",
+  "employee_areas_of_strength_section",
+  "attitude_qcs",
+  "initiative_qcs",
+  "dependability_qcs",
+  "work_quality_qcs",
+  "work_quantity_qcs",
+  "column_break_mcqyk",
+  "knowledge_of_job_qcs",
+  "team_play_qcs",
+  "organization_ability_qcs",
+  "judgement_qcs",
+  "responsibility_qcs",
+  "overall_ratingqcs",
+  "overall_rating_qcs",
   "section_break_16",
   "employee_feedback_after_discussion_with_line_manager",
-  "employee_areas_of_strength_section",
-  "attitude",
-  "initiative",
-  "dependability",
-  "work_quality",
-  "work_quantity",
-  "column_break_24",
-  "knowledge_of_job",
-  "team_play",
-  "organization_ability",
-  "judgement",
-  "responsibility",
-  "overall_rating_section",
-  "overall_rating",
   "section_break_20",
   "general_manager_feedback",
   "hr_use_only_section",
@@ -94,7 +95,8 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Employee",
-   "options": "Employee"
+   "options": "Employee",
+   "reqd": 1
   },
   {
    "fetch_from": "employee.employee_name",
@@ -188,17 +190,9 @@
    "label": "EMPLOYEE AREAS OF STRENGTH"
   },
   {
-   "fieldname": "column_break_24",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "overall_rating_section",
-   "fieldtype": "Section Break",
-   "label": "OVERALL RATING"
-  },
-  {
    "fieldname": "section_break_20",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "permlevel": 1
   },
   {
    "fieldname": "general_manager_feedback",
@@ -356,61 +350,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "attitude",
-   "fieldtype": "Rating",
-   "label": "attitude"
-  },
-  {
-   "fieldname": "initiative",
-   "fieldtype": "Rating",
-   "label": "initiative"
-  },
-  {
-   "fieldname": "dependability",
-   "fieldtype": "Rating",
-   "label": "dependability"
-  },
-  {
-   "fieldname": "work_quality",
-   "fieldtype": "Rating",
-   "label": "work_quality"
-  },
-  {
-   "fieldname": "work_quantity",
-   "fieldtype": "Rating",
-   "label": "work_quantity"
-  },
-  {
-   "fieldname": "knowledge_of_job",
-   "fieldtype": "Rating",
-   "label": "knowledge_of_job"
-  },
-  {
-   "fieldname": "team_play",
-   "fieldtype": "Rating",
-   "label": "team_play"
-  },
-  {
-   "fieldname": "organization_ability",
-   "fieldtype": "Rating",
-   "label": "organization_ability"
-  },
-  {
-   "fieldname": "judgement",
-   "fieldtype": "Rating",
-   "label": "judgement"
-  },
-  {
-   "fieldname": "responsibility",
-   "fieldtype": "Rating",
-   "label": "responsibility"
-  },
-  {
-   "fieldname": "overall_rating",
-   "fieldtype": "Rating",
-   "label": "overall_rating"
-  },
-  {
    "fieldname": "hr_recommendations",
    "fieldtype": "Small Text",
    "label": "HR Recommendations",
@@ -462,13 +401,79 @@
    "fieldtype": "Data",
    "label": "Notes",
    "permlevel": 2
+  },
+  {
+   "fieldname": "attitude_qcs",
+   "fieldtype": "Rating",
+   "label": "Attitude"
+  },
+  {
+   "fieldname": "initiative_qcs",
+   "fieldtype": "Rating",
+   "label": "Initiative"
+  },
+  {
+   "fieldname": "dependability_qcs",
+   "fieldtype": "Rating",
+   "label": "Dependability"
+  },
+  {
+   "fieldname": "work_quality_qcs",
+   "fieldtype": "Rating",
+   "label": "Work Quality"
+  },
+  {
+   "fieldname": "work_quantity_qcs",
+   "fieldtype": "Rating",
+   "label": "Work Quantity"
+  },
+  {
+   "fieldname": "column_break_mcqyk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "knowledge_of_job_qcs",
+   "fieldtype": "Rating",
+   "label": "Knowledge of Job"
+  },
+  {
+   "fieldname": "team_play_qcs",
+   "fieldtype": "Rating",
+   "label": "Team Play"
+  },
+  {
+   "fieldname": "organization_ability_qcs",
+   "fieldtype": "Rating",
+   "label": "Organization Ability"
+  },
+  {
+   "fieldname": "judgement_qcs",
+   "fieldtype": "Rating",
+   "label": "Judgement"
+  },
+  {
+   "fieldname": "responsibility_qcs",
+   "fieldtype": "Rating",
+   "label": "Responsibility"
+  },
+  {
+   "fieldname": "overall_rating_qcs",
+   "fieldtype": "Rating",
+   "label": "Overall Rating"
+  },
+  {
+   "fieldname": "overall_ratingqcs",
+   "fieldtype": "Section Break",
+   "label": "OVERALL RATING"
   }
  ],
  "is_submittable": 1,
- "modified": "2023-03-08 08:33:46.233697",
+ "links": [],
+ "modified": "2025-02-23 13:30:18.508362",
  "modified_by": "Administrator",
  "module": "Summer Note",
  "name": "NEST Performance Appraisal",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
@@ -487,6 +492,7 @@
  "search_fields": "year, employee",
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "title_field": "title",
  "track_changes": 1,
  "track_seen": 1,

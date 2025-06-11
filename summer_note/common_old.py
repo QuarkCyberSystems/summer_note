@@ -122,7 +122,7 @@ def cancel_dues(leave_application, method):
 # ********  Salary Slip - after_insert  ********
 def add_expense_claim(salary_slip, method):
 	##frappe.errprint ('Processing for ' + salary_slip.employee)
-	##frappe.errprint ('******** 3 ADD EXPENSE CLAIMS ********')
+	frappe.errprint ('******** 3 ADD EXPENSE CLAIMS ********')
 	if salary_slip.expense_claim_added == 0:
 		##frappe.errprint('Adding Expense Claims')
 		exp_claim =  frappe.get_all('Expense Claim', filters={
@@ -241,8 +241,9 @@ def add_expense_claim(salary_slip, method):
 # This method adds the monthly ACCRUALS for Leave Salary, Airticket, EOSB, and Pension Payable for each employee. 
 # ********  Salary Slip - after_insert  ********
 def add_benefits(salary_slip, method):
-	##frappe.errprint ('******** 4 ADD BENIFITS ********')
+	frappe.errprint ('******** 4 ADD BENIFITS ********')
 	has_benifits = False
+	jv_amount = 0
 	emp_file = frappe.get_doc("Employee", salary_slip.employee)
 	emp = frappe.get_doc("Employee", salary_slip.employee)
 	leave_salary_comp = 0
@@ -321,9 +322,10 @@ def add_benefits(salary_slip, method):
 				if comp.company == salary_slip.company:
 					basic_ledger = comp.default_account
  
-	##frappe.errprint('4. add_benefits Cost Center - ' + frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"))
+	frappe.errprint('************** 4. add_benefits Cost Center - ' + frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"))
 
 	if emp_file.leave_salary:
+		frappe.errprint('************ Add Benifits - Leave Salary')
 		for item in salary_slip.get("earnings"):
 			included = frappe.get_value("Salary Component", item.salary_component, "include_in_leave_salary_provision")
 			if included:
@@ -358,9 +360,11 @@ def add_benefits(salary_slip, method):
 				})
 		jv.salary_slip = salary_slip.name
 		jv.save()
+		jv_amount += leave_salary
 
 
 	if emp_file.ticket_entitlement:
+		frappe.errprint('************ Add Benifits - Ticket Entitlement')
 		ticket_value = frappe.get_value("Ticket Sectors", {"area":emp_file.ticket_sector}, "amount")
 		ticket_monthly = ticket_value * float(salary_slip.payment_days) / float(emp_file.ticket_entitlement_workdays)
 		ticket_account = frappe.get_value("Company", salary_slip.company, "default_ticket_payable_account")
@@ -392,9 +396,11 @@ def add_benefits(salary_slip, method):
 				})
 		jv.salary_slip = salary_slip.name
 		jv.save()
+		jv_amount += ticket_monthly
 
 
 	if emp.eosb_selection != "EOSB Not Entitled":
+		frappe.errprint('************ Add Benifits - EOSB')
 		eosb_account = frappe.get_value("Company", salary_slip.company, "default_eosb_payable_account")
 		eosb_recv = frappe.get_value("Company", salary_slip.company, "default_eosb_receivable_account") 
 		working_years = float(month_diff(salary_slip.posting_date, emp_file.date_of_joining)) / 12
@@ -424,59 +430,27 @@ def add_benefits(salary_slip, method):
 
 		old_eosb = get_balance_on(eosb_account, salary_slip.end_date, "Employee", salary_slip.employee)
 		old_eosb = abs(float(old_eosb))
-		##frappe.errprint(old_eosb)
-		##frappe.errprint(eosb)
+		frappe.errprint('old_eosb ' + str(old_eosb))
+		frappe.errprint('eosb' + str(eosb))
 		post_eosb = eosb - old_eosb
-
-		if frappe.get_value("Employee", salary_slip.employee, "eosb_selection") == "EOSB Entitled":
-			jv.append("accounts",{
-				"account":eosb_account,
-				"party_type":"Employee",
-				"party":salary_slip.employee,
-				"credit_in_account_currency": post_eosb,
-				#*******************************************************************************************************************************
-				# ADDED CODE
-				#*******************************************************************************************************************************
-				"divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-				"department":frappe.get_value("Employee", salary_slip.employee, "department"),
-				"cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
-				"employee":salary_slip.employee,
-				"user_remark":salary_slip.name
-				})
-			jv.append("accounts",{
-				"account": eosb_ledger,
-				"debit_in_account_currency": post_eosb,
-				#*******************************************************************************************************************************
-				# ADDED CODE
-				#*******************************************************************************************************************************
-				"divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-				"department":frappe.get_value("Employee", salary_slip.employee, "department"),
-				"cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
-				"employee":salary_slip.employee,
-				"user_remark":salary_slip.name
-				})
-			jv.salary_slip = salary_slip.name
-			jv.save()
-		
-		if frappe.get_value("Employee", salary_slip.employee, "eosb_selection") == "EOSB Receivable":
-			jv.append("accounts",{
-				"account":eosb_account,
-				"party_type":"Employee",
-				"party":salary_slip.employee,
-				"credit_in_account_currency": post_eosb,
-				#*******************************************************************************************************************************
-				# ADDED CODE
-				#*******************************************************************************************************************************
-				"divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
-				"department":frappe.get_value("Employee", salary_slip.employee, "department"),
-				"cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
-				"employee":salary_slip.employee,
-				"user_remark":salary_slip.name
-				})
-			jv.append("accounts",{
-					"account": eosb_recv,
+		if post_eosb>0:
+			if frappe.get_value("Employee", salary_slip.employee, "eosb_selection") == "EOSB Entitled":
+				jv.append("accounts",{
+					"account":eosb_account,
 					"party_type":"Employee",
 					"party":salary_slip.employee,
+					"credit_in_account_currency": post_eosb,
+					#*******************************************************************************************************************************
+					# ADDED CODE
+					#*******************************************************************************************************************************
+					"divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+					"department":frappe.get_value("Employee", salary_slip.employee, "department"),
+					"cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+					"employee":salary_slip.employee,
+					"user_remark":salary_slip.name
+					})
+				jv.append("accounts",{
+					"account": eosb_ledger,
 					"debit_in_account_currency": post_eosb,
 					#*******************************************************************************************************************************
 					# ADDED CODE
@@ -487,13 +461,48 @@ def add_benefits(salary_slip, method):
 					"employee":salary_slip.employee,
 					"user_remark":salary_slip.name
 					})
-			jv.salary_slip = salary_slip.name
-			jv.save()
+				jv.salary_slip = salary_slip.name
+				jv.save()
+				jv_amount += post_eosb
+			
+			if frappe.get_value("Employee", salary_slip.employee, "eosb_selection") == "EOSB Receivable":
+				jv.append("accounts",{
+					"account":eosb_account,
+					"party_type":"Employee",
+					"party":salary_slip.employee,
+					"credit_in_account_currency": post_eosb,
+					#*******************************************************************************************************************************
+					# ADDED CODE
+					#*******************************************************************************************************************************
+					"divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+					"department":frappe.get_value("Employee", salary_slip.employee, "department"),
+					"cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+					"employee":salary_slip.employee,
+					"user_remark":salary_slip.name
+					})
+				jv.append("accounts",{
+						"account": eosb_recv,
+						"party_type":"Employee",
+						"party":salary_slip.employee,
+						"debit_in_account_currency": post_eosb,
+						#*******************************************************************************************************************************
+						# ADDED CODE
+						#*******************************************************************************************************************************
+						"divisions": frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "division"),
+						"department":frappe.get_value("Employee", salary_slip.employee, "department"),
+						"cost_center":frappe.get_value("Department", frappe.get_value("Employee", salary_slip.employee, "department"), "cost_center"),
+						"employee":salary_slip.employee,
+						"user_remark":salary_slip.name
+						})
+				jv.salary_slip = salary_slip.name
+				jv.save()
+				jv_amount += post_eosb
 	
 	#*******************************************************************************************************************************
 	#ADDED CODE
 	#*******************************************************************************************************************************                
 	if PFC>0:
+		frappe.errprint('Pension Fund')
 		pension_payable = frappe.get_value("Company", salary_slip.company, "default_pension_payable_account")
 		pension_expense = frappe.get_value("Company", salary_slip.company, "default_pension_expense_account")
 		jv.append("accounts",{
@@ -525,10 +534,12 @@ def add_benefits(salary_slip, method):
 			   })
 		jv.salary_slip = salary_slip.name
 		jv.save()
+		jv_amount += PFC
 	#*******************************************************************************************************************************
-	if has_benifits:
+	if has_benifits and jv_amount>0:
 		jv.submit()
-
+	
+	frappe.errprint('************ Add Benifits - calculate_net_pay')
 	salary_slip.calculate_net_pay()
 
 #5/13
@@ -537,7 +548,7 @@ def add_benefits(salary_slip, method):
 # ********  Salary Slip - after_insert  ********
 def add_dues(salary_slip, method):
 	
-	##frappe.errprint ('******** 5 ADD DUES ********')
+	frappe.errprint ('******** 5 ADD DUES ********')
 	##frappe.errprint(salary_slip.employee)
 	la_list = frappe.get_all('Leave Application', filters={
 				'status': 'Approved',
@@ -863,6 +874,7 @@ def add_dues(salary_slip, method):
 # ********  Salary Slip - after_insert  ********
 @frappe.whitelist()  # WHY whitelist it?? 
 def allocate_leave(salary_slip, method):
+	frappe.errprint('******** 6 ALLOCATE LEAVE ********')
 	for item in frappe.get_all("Employee", filters={"status": "Active",  "leave_salary": 1, "Employee": salary_slip.employee}, fields=["name"]): # FIXED NOW *********************   ALL EMPLOYEES !!!    *******************
 		emp = frappe.get_doc("Employee", item.name)
 		mldays = 0
@@ -1946,6 +1958,9 @@ def create_call_off_order(filepath, blanket_order_no):
 	so_o.icv_retention = bo_o.icv_retention
 	so_o.ld_applicable = bo_o.ld_applicable
 	so_o.sales_region = bo_o.sales_region
+	so_o.tc_name = bo_o.tc_name
+	so_o.terms = bo_o.terms
+
 
 	#frappe.errprint('SO Transaction Date: ' + str(so_o.transaction_date))
 	#frappe.errprint('SO Delivery Date: ' + str(so_o.delivery_date))
@@ -1970,7 +1985,8 @@ def create_call_off_order(filepath, blanket_order_no):
 			"rate":co_item['rate'],
 			"uom": bo_item_dict[0]['uom'],
 			"delivery_date": co_item['required_date'],
-			"additional_notes": additional_notes,  
+			"additional_notes": additional_notes, 
+			"against_blanket_order": '1', 
 			"blanket_order":blanket_order_no,
 			"bo_detail": bo_item_dict[0]['name']
 		}
@@ -2078,11 +2094,17 @@ def create_call_off_purchase_order(blanket_order_no, sales_order_no):
 	po_o.company = bo_o.company
 	po_o.transaction_date = so_o.transaction_date #*********OVERWRITTEN FOR TESTING***************************** # date.today()
 	po_o.sales_order_no = so_o.name
+	po_o.brand_reference = bo_o.brand_reference
+	po_o.project_type = bo_o.agreement_type
 	po_o.customer = bo_o.customer
 	po_o.currency = bo_o.buying_currency
 	po_o.set_warehouse = "Stores - " + co	
 	po_o.tc_name = bo_o.btc_name
+	po_o.terms = bo_o.buying_terms
 	po_o.payment_terms_template = bo_o.payment_terms_template
+	po_o.letter_head = frappe.get_value('Company', bo_o.company, 'default_letter_head')
+	po_o.partial_delivery_and_invoicing_not_allowed = bo_o.partial_delivery_and_invoicing_not_allowed
+	po_o.duty_exemption_applicable = bo_o.duty_exemption_applicable
 
 	#ADD CHILD ITEMS
 	for item in frappe.get_all("Sales Order Item", filters={"parent": so_o.name}, order_by="idx", \
@@ -2214,6 +2236,9 @@ def make_create_call_off_order(values,blanket_order_no):
 	so_o.icv_retention = bo_o.icv_retention
 	so_o.ld_applicable = bo_o.ld_applicable
 	so_o.sales_region = bo_o.sales_region
+	so_o.tc_name = bo_o.tc_name
+	so_o.terms = bo_o.terms
+
 
 	idx = 0
 	for co_item in lines:

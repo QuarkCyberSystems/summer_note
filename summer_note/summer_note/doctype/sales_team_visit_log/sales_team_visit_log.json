@@ -1,4 +1,6 @@
 {
+ "actions": [],
+ "allow_import": 1,
  "autoname": "VL.YY./.MM./.###",
  "creation": "2023-03-29 21:14:01.574452",
  "doctype": "DocType",
@@ -7,14 +9,17 @@
  "field_order": [
   "employee",
   "date",
-  "name1",
-  "opportunity",
-  "sales_order",
-  "column_break_6",
+  "column_break_jxw4x",
   "employee_name",
+  "section_break_fmcs5",
   "visit_to",
+  "visit_to_name",
   "contact",
+  "column_break_6",
+  "opportunity",
   "quotation",
+  "sales_order",
+  "brand",
   "section_break_11",
   "visit_notes"
  ],
@@ -33,13 +38,6 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Date",
-   "reqd": 1
-  },
-  {
-   "fieldname": "name1",
-   "fieldtype": "Dynamic Link",
-   "label": "Name",
-   "options": "visit_to",
    "reqd": 1
   },
   {
@@ -94,12 +92,36 @@
    "fieldname": "visit_notes",
    "fieldtype": "Small Text",
    "label": "Visit Notes"
+  },
+  {
+   "fieldname": "column_break_jxw4x",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_fmcs5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "visit_to_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Name",
+   "options": "visit_to",
+   "reqd": 1
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "label": "Brand",
+   "options": "Brand",
+   "reqd": 1
   }
  ],
- "modified": "2023-03-29 21:23:28.756800",
+ "links": [],
+ "modified": "2024-11-19 08:59:59.396787",
  "modified_by": "Administrator",
  "module": "Summer Note",
  "name": "Sales Team Visit Log",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
@@ -116,5 +138,6 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC"
+ "sort_order": "DESC",
+ "states": []
 }
