@@ -4,7 +4,7 @@
 import frappe
 from frappe import _
 
-from summer_note.common import create_stock_aging
+from summer_note.common_old import create_stock_aging
 
 
 def execute(filters=None):

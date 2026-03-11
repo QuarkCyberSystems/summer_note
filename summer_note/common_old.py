@@ -2302,7 +2302,7 @@ def get_sales_team(brand, type, region):
 
 #*********************************** ADDED 2023-04-08 CREATE STOCK AGING TABLE FOR STOCK AGING REPORT ***********************
 @frappe.whitelist()
-def create_stock_aging():
+def create_stock_aging(to_date=None):
 	#frappe.errprint ('**************** Entering create_stock_aging ****************************')
 
 	#1 Delete All Temporary Table, if any.
@@ -2383,7 +2383,8 @@ def create_stock_aging():
 	frappe.db.sql(sql)
 
 	#6 Create Final Stock Aging Table
-	sql = """CREATE TABLE stock_aging ( 
+	frappe.db.sql("""DROP TABLE IF EXISTS stock_aging""")
+	sql = """CREATE TABLE stock_aging (
 			select item_code, item_name, item_group, brand, warehouse, company, closing_balance, 
 			(sum(`0-30 Value`)+sum(`>30 Value`)+ sum(`>90 Value`)+sum(`>180 Value`)+sum(`>365 Value`)+sum(`>730 Value`)+sum(`>1095 Value`)) as balance_value, 
 			sum(`0-30`) as `0-30 Qty`,sum(`0-30 Value`) as `0-30 Amount`, 
