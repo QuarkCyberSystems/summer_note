@@ -1,17 +1,18 @@
 # Copyright (c) 2013, QCS and contributors
 # For license information, please see license.txt
 
-from __future__ import unicode_literals
 import frappe
 from frappe import _
-from nest_qcs.common import create_stock_aging
+
+from summer_note.common import create_stock_aging
+
 
 def execute(filters=None):
 	# CHECK FILTERS
 	if not filters:
 		columns, data = [], []
 		return columns, data
-	
+
 	group_by=""
 	if filters.get("group_by"):
 		group_by = filters.get("group_by")
@@ -20,115 +21,122 @@ def execute(filters=None):
 	if filters.get("company"):
 		company = filters.get("company")
 
+	to_date = ""
+	if filters.get("to_date"):
+		to_date = filters.get("to_date")
+
+	# CREATE STOCK AGING
+	create_stock_aging(to_date)
+
 	# PREPARE COLUMN LIST
 	if group_by == "Item Code":
 		columns = [
-			{'label': _('Company'), 'fieldname': 'company', 'fieldtype': 'Link', 'options': 'company', 'width': 100}, 
-			{'label': _('Item Code'), 'fieldname': 'item_code', 'fieldtype': 'Link', 'options': 'item', 'width': 100}, 
-			{'label': _('Item Name'), 'fieldname': 'item_name', 'fieldtype': 'Data', 'width': 100}, 
-			{'label': _('Item Group'), 'fieldname': 'item_group', 'fieldtype': 'Link', 'options': 'item group', 'width': 100}, 
-			{'label': _('Brand'), 'fieldname': 'brand', 'fieldtype': 'Link', 'options': 'brand', 'width': 100}, 
-			{'label': _('Warehouse'), 'fieldname': 'warehouse', 'fieldtype': 'Link', 'options': 'warehouse', 'width': 100}, 
-			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100}, 
+			{'label': _('Company'), 'fieldname': 'company', 'fieldtype': 'Link', 'options': 'company', 'width': 100},
+			{'label': _('Item Code'), 'fieldname': 'item_code', 'fieldtype': 'Link', 'options': 'item', 'width': 100},
+			{'label': _('Item Name'), 'fieldname': 'item_name', 'fieldtype': 'Data', 'width': 100},
+			{'label': _('Item Group'), 'fieldname': 'item_group', 'fieldtype': 'Link', 'options': 'item group', 'width': 100},
+			{'label': _('Brand'), 'fieldname': 'brand', 'fieldtype': 'Link', 'options': 'brand', 'width': 100},
+			{'label': _('Warehouse'), 'fieldname': 'warehouse', 'fieldtype': 'Link', 'options': 'warehouse', 'width': 100},
+			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100},
 			{'label': _('>1095 Amount'), 'fieldname': '>1095 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}
 		]
 	elif group_by == "Item Group":
 		columns = [
-			{'label': _('Company'), 'fieldname': 'company', 'fieldtype': 'Link', 'options': 'company', 'width': 100}, 
-			{'label': _('Item Group'), 'fieldname': 'item_group', 'fieldtype': 'Link', 'options': 'item group', 'width': 100}, 
-			{'label': _('Warehouse'), 'fieldname': 'warehouse', 'fieldtype': 'Link', 'options': 'warehouse', 'width': 100}, 
-			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100}, 
+			{'label': _('Company'), 'fieldname': 'company', 'fieldtype': 'Link', 'options': 'company', 'width': 100},
+			{'label': _('Item Group'), 'fieldname': 'item_group', 'fieldtype': 'Link', 'options': 'item group', 'width': 100},
+			{'label': _('Warehouse'), 'fieldname': 'warehouse', 'fieldtype': 'Link', 'options': 'warehouse', 'width': 100},
+			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100},
 			{'label': _('>1095 Amount'), 'fieldname': '>1095 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}
 		]
 	elif group_by == "Brand":
 		columns = [
-			{'label': _('Brand'), 'fieldname': 'brand', 'fieldtype': 'Link', 'options': 'brand', 'width': 100}, 
-			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100}, 
+			{'label': _('Brand'), 'fieldname': 'brand', 'fieldtype': 'Link', 'options': 'brand', 'width': 100},
+			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100},
 			{'label': _('>1095 Amount'), 'fieldname': '>1095 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}
 		]
 	elif group_by == "Brand and Warehouse":
 		columns = [
-			{'label': _('Brand'), 'fieldname': 'brand', 'fieldtype': 'Link', 'options': 'brand', 'width': 100}, 
-			{'label': _('Warehouse'), 'fieldname': 'warehouse', 'fieldtype': 'Link', 'options': 'warehouse', 'width': 100}, 
-			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100}, 
+			{'label': _('Brand'), 'fieldname': 'brand', 'fieldtype': 'Link', 'options': 'brand', 'width': 100},
+			{'label': _('Warehouse'), 'fieldname': 'warehouse', 'fieldtype': 'Link', 'options': 'warehouse', 'width': 100},
+			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100},
 			{'label': _('>1095 Amount'), 'fieldname': '>1095 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}
 		]
 	elif group_by == "Warehouse":
 		columns = [
-			{'label': _('Company'), 'fieldname': 'company', 'fieldtype': 'Link', 'options': 'company', 'width': 100}, 
-			{'label': _('Warehouse'), 'fieldname': 'warehouse', 'fieldtype': 'Link', 'options': 'warehouse', 'width': 100}, 
-			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}, 
-			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100}, 
-			{'label': _('>1095 Amount'), 'fieldname': '>1095 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100} 
+			{'label': _('Company'), 'fieldname': 'company', 'fieldtype': 'Link', 'options': 'company', 'width': 100},
+			{'label': _('Warehouse'), 'fieldname': 'warehouse', 'fieldtype': 'Link', 'options': 'warehouse', 'width': 100},
+			{'label': _('Balance Qty'), 'fieldname': 'closing_balance', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('Balance Value'), 'fieldname': 'balance_value', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('0-30 Qty'), 'fieldname': '0-30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('0-30 Amount'), 'fieldname': '0-30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>30 Qty'), 'fieldname': '>30 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>30 Amount'), 'fieldname': '>30 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>90 Qty'), 'fieldname': '>90 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>90 Amount'), 'fieldname': '>90 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>180 Qty'), 'fieldname': '>180 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>180 Amount'), 'fieldname': '>180 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>365 Qty'), 'fieldname': '>365 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>365 Amount'), 'fieldname': '>365 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>730 Qty'), 'fieldname': '>730 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>730 Amount'), 'fieldname': '>730 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100},
+			{'label': _('>1095 Qty'), 'fieldname': '>1095 Qty', 'fieldtype': 'Int', 'width': 100},
+			{'label': _('>1095 Amount'), 'fieldname': '>1095 Amount', 'fieldtype': 'Currency', 'options': 'currency', 'width': 100}
 		]
 
 	# PREPARE DATA
